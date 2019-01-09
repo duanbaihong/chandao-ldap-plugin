@@ -11,10 +11,10 @@
 <?php
 class ldapModel extends model
 {
-    public function identify($host, $dn, $pwd)
+    public function identify($host,$port, $dn, $pwd)
     {
         $ret = '';
-        $ds = ldap_connect($host);
+        $ds = ldap_connect($host,$port);
         if ($ds) {
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,3);
             ldap_bind($ds, $dn, $pwd);
@@ -32,10 +32,13 @@ class ldapModel extends model
     {
         $ds = ldap_connect($config->proto."://".$config->host,$config->port);
         if ($ds) {
-            ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,3);
+            ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,$config->version);
             ldap_bind($ds, $config->bindDN, $config->bindPWD);
             $attrs = [$config->groupField];
-            $rlt = ldap_search($ds, $config->groupSearchOU.','.$config->baseDN, $config->groupFilter, $attrs);
+            $rlt = ldap_search($ds, "$config->groupSearchOU,$config->baseDN", $config->groupFilter, $attrs);
+            if(!$rlt){
+                return ldap_error($ds);
+            }
             $data = ldap_get_entries($ds, $rlt);
             return $data;
         }

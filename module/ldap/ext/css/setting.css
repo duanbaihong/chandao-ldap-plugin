@@ -1,0 +1,11 @@
+.ldap_select_proto {
+	padding: 0px;border:none;
+}
+.ldap_select_proto select {
+ 	width:70px;
+ 	min-width:70px;
+}
+.ldap_port {
+	width:60px;
+ 	min-width:60px;
+}

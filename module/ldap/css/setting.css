@@ -1,0 +1,27 @@
+.ldap_setting {
+    width: 700px;
+    margin: 0px auto;
+}
+.ldap_setting #titlebar{
+    font-size: 20px;
+}
+.ldap_select_proto {
+    padding: 0px;border:none;
+}
+.ldap_select_proto select {
+    width:70px;
+    min-width:70px;
+}
+.ldap_port {
+    width:60px;
+    min-width:60px;
+}
+.ldap_setting .form-condensed .input-group>.input-group-addon:first-child {
+    padding: 0px;
+}
+.ldap_setting .table-form>tbody>tr>th,.table-form>tbody>tr>td{
+    padding: 5px;
+}
+.ldap_setting #ldapHost{
+    width: 330px;
+}

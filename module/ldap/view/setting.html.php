@@ -94,10 +94,16 @@ include '../../common/view/header.html.php';
         <tr>
           <th>
             <?php echo $lang->ldap->userFilter; ?></th>
-          <td class='w-p50 required'>
-            <?php echo html::input('ldapUsersFilter', $config->
+          <td class='w-p50'>
+            <?php echo html::input('ldapUserFilter', $config->
             ldap->userFilter, "class='form-control' placeholder='(&(uid=%s))'");?>
           </td>
+        </tr>
+        <tr>
+          <th>
+            <?php echo $lang->ldap->userFieldMap; ?></th>
+          <td class='w-p50 required'>
+            <?php echo html::input('ldapUserFieldMap', stripslashes($config->ldap->userFieldMap), "class='form-control' required=required placeholder=\"{'account': 'uid','email': 'mail','realname':'sn','mobile':'phone'}\"");?></td>
         </tr>
         <tr>
           <th>
@@ -110,53 +116,29 @@ include '../../common/view/header.html.php';
         <tr>
           <th>
             <?php echo $lang->ldap->groupFilter; ?></th>
-          <td class='w-p50 required'>
+          <td class='w-p50'>
             <?php echo html::input('ldapGroupFilter', $config->
             ldap->groupFilter, "class='form-control' placeholder='(|(objectclass=groupOfNames)(objectclass=groupOfUniqueNames)(objectclass=posixGroup))'");?>
           </td>
         </tr>
         <tr>
           <th>
-            <?php echo $lang->ldap->groupField; ?></th>
+            <?php echo $lang->ldap->groupFieldMap; ?></th>
           <td class='w-p50 required'>
-            <?php echo html::input('ldapGroupField', $config->
-            ldap->groupField, "class='form-control' required=required placeholder='cn'");?>
+            <?php echo html::input('ldapGroupFieldMap', stripslashes($config->
+            ldap->groupFieldMap), "class='form-control' required=required placeholder=\"{'name':'cn','desc':'description'}\"");?>
           </td>
         </tr>
         <tr>
           <th>
             <?php echo $lang->ldap->syncGroups; ?></th>
-          <td class='w-p50 required'>
+          <td class='w-p50'>
             <div class="checkbox-primary inline-block">
               <input type="checkbox" name="ldapSyncGroups" value="ldapSyncGroups"  <?php if($config->
               ldap->syncGroups) echo "checked='checked'"?>  id="ldapSyncGroups">
               <label for="closedProduct"><?php echo $lang->ldap->syncLabels; ?></label>
             </div>
           </td>
-        </tr>
-        <tr>
-          <th>
-            <?php echo $lang->ldap->uid; ?></th>
-          <td class='w-p50 required'>
-            <?php echo html::input('ldapUserID', $config->ldap->uid, "class='form-control' required=required placeholder='uid'");?></td>
-        </tr>
-        <tr>
-          <th>
-            <?php echo $lang->ldap->mail; ?></th>
-          <td class='w-p50 required'>
-            <?php echo html::input('ldapMail', $config->ldap->mail, "class='form-control' required=required placeholder='mail'");?></td>
-        </tr>
-        <tr>
-          <th>
-            <?php echo $lang->ldap->name; ?></th>
-          <td class='w-p50 required'>
-            <?php echo html::input('ldapName', $config->ldap->name, "class='form-control' required=required placeholder='sn'");?></td>
-        </tr>
-        <tr>
-          <th>
-            <?php echo $lang->ldap->phone; ?></th>
-          <td class='w-p50 required'>
-            <?php echo html::input('ldapPhone', $config->ldap->phone, "class='form-control' placeholder='phone'");?></td>
         </tr>
         <tr>
           <td class="text-center" colspan="2">

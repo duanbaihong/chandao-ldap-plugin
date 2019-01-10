@@ -18,7 +18,6 @@ function syncGroups() {
 $("#ldapProto").change(function() {
     var val=$(this).val()
     var port=389
-    console.log(val)
     if(val=='ldap') port=389
     if(val=='ldaps') port=636
     $("#ldapPort").val(port)

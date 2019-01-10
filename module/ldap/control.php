@@ -41,6 +41,8 @@ class ldap extends control
     public function save()
     {
         if (!empty($_POST)) {
+            $groupmap=addslashes($this->post->ldapGroupFieldMap);
+            $usermap=addslashes($this->post->ldapUserFieldMap);
             $this->config->ldap->proto         = $this->post->ldapProto;
             $this->config->ldap->host          = $this->post->ldapHost;
             $this->config->ldap->port          = $this->post->ldapPort;
@@ -53,11 +55,8 @@ class ldap extends control
             $this->config->ldap->groupSearchOU = $this->post->ldapGroupOU;
             $this->config->ldap->groupFilter   = $this->post->ldapGroupFilter;
             $this->config->ldap->syncGroups    = $this->post->ldapSyncGroups;
-            $this->config->ldap->groupField    = $this->post->ldapGroupField;
-            $this->config->ldap->uid           = $this->post->ldapUserID;
-            $this->config->ldap->name          = $this->post->ldapName;
-            $this->config->ldap->mail          = $this->post->ldapMail;
-            $this->config->ldap->phone         = $this->post->ldapPhone;
+            $this->config->ldap->groupFieldMap = $groupmap;
+            $this->config->ldap->userFieldMap  = $usermap;
 
             // 此处我们把配置写入配置文件
             $ldapConfig = "<?php \n"
@@ -74,11 +73,8 @@ class ldap extends control
                           ."\$config->ldap->groupSearchOU = '{$this->post->ldapGroupOU}';\n"
                           ."\$config->ldap->groupFilter = '{$this->post->ldapGroupFilter}';\n"
                           ."\$config->ldap->syncGroups = '{$this->post->ldapSyncGroups}';\n"
-                          ."\$config->ldap->groupField = '{$this->post->ldapGroupField}';\n"
-                          ."\$config->ldap->uid = '{$this->post->ldapUserID}';\n"
-                          ."\$config->ldap->mail = '{$this->post->ldapMail}';\n"
-                          ."\$config->ldap->phone = '{$this->post->ldapPhone}';\n"
-                          ."\$config->ldap->name = '{$this->post->ldapName}';\n";
+                          ."\$config->ldap->groupFieldMap = '{$groupmap}';\n"
+                          ."\$config->ldap->userFieldMap = '{$usermap}';\n";
 
             $file = fopen("config.php", "w") or die("Unable to open file!");
             fwrite($file, $ldapConfig); 
@@ -90,23 +86,23 @@ class ldap extends control
 
     public function test()
     {
-        echo $this->ldap->identify($this->get->host, $this->get->dn, $this->get->pwd);
+        $this->ldap->identify($this->get->host, $this->get->dn, $this->get->pwd);
     }
 
     public function sync()
-    {  
-        $users = $this->ldap->sync2db($this->config->ldap);
-        echo $users;
+    { 
+      $groups = $this->ldap->syncGroups2db($this->config->ldap);
+      echo $groups;
     }
 
-    public function identify($user, $pwd)
-    {
-        $ret = false;
-        $account = $this->config->ldap->uid.'='.$user.','.$this->config->ldap->baseDN;
-        if (0 == strcmp('Success', $this->ldap->identify($this->config->ldap->host, $account, $pwd))) {
-            $ret = true;
-        }
+    // public function identify($user, $pwd)
+    // {
+    //     $ret = false;
+    //     $account = $this->config->ldap->uid.'='.$user.','.$this->config->ldap->baseDN;
+    //     if (0 == strcmp('Success', $this->ldap->identify($this->config->ldap->host, $account, $pwd))) {
+    //         $ret = true;
+    //     }
 
-        echo $ret;
-    }
+    //     echo $ret;
+    // }
 }

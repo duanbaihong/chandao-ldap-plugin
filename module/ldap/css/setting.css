@@ -11,6 +11,10 @@
 .ldap_select_proto select {
     width:70px;
     min-width:70px;
+    margin-right: -1px;
+}
+.ldap_select_proto select:focus{
+    z-index: 1000;
 }
 .ldap_port {
     width:60px;

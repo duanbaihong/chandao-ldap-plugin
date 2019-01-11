@@ -12,6 +12,8 @@
     width:70px;
     min-width:70px;
     margin-right: -1px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
 }
 .ldap_select_proto select:focus{
     z-index: 1000;

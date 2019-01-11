@@ -1,12 +1,10 @@
 <?php
 /**
- * The detect view file of mail module of ZenTaoPMS.
+ * The model file of ldap module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2015 青岛易软天创网络科技有限公司(QingDao Nature Easy Soft Network Technology Co,LTD, www.cnezsoft.com)
- * @license     ZPL (http://zpl.pub/page/zplv11.html)
- * @author      Chunsheng Wang <wwccss@cnezsoft.com>
-* @package     mail
- * @version     $Id$
+ * @license     dbh ()
+ * @author      dbh888
+ * @package     ldap
  * @link        http://www.zentao.net
  */
 include '../../common/view/header.html.php';
@@ -49,9 +47,8 @@ include '../../common/view/header.html.php';
           <th>
             <?php echo $lang->ldap->version; ?></th>
           <td class='w-p50 required'>
-
-            <?php echo html::input('ldapVersion', $config->
-            ldap->version, "class='form-control' required placeholder='1,2,3'");?>
+            <?php echo html::select('ldapVersion',  array('2'=>'2','3'=>'3'),$config->
+            ldap->version, "class='form-control chosen' required placeholder='2,3'");?>
           </td>
         </tr>
         <tr>
@@ -134,7 +131,7 @@ include '../../common/view/header.html.php';
             <?php echo $lang->ldap->syncGroups; ?></th>
           <td class='w-p50'>
             <div class="checkbox-primary inline-block">
-              <input type="checkbox" name="ldapSyncGroups" value="ldapSyncGroups"  <?php if($config->
+              <input type="checkbox" name="ldapSyncGroups" value="true"  <?php if($config->
               ldap->syncGroups) echo "checked='checked'"?>  id="ldapSyncGroups">
               <label for="closedProduct"><?php echo $lang->ldap->syncLabels; ?></label>
             </div>
@@ -165,7 +162,7 @@ include '../../common/view/header.html.php';
         </h4>
       </div>
       <div class="modal-body">
-        <form method="post" target="hiddenwin" action="/index.php?m=ldap&f=ldaptest">
+        <form method="post" class="ldap_usertest_form" target="hiddenwin" action="#">
           <div class="container">
             <table class="table table-form">
               <tr>
@@ -181,8 +178,8 @@ include '../../common/view/header.html.php';
                 <th>
                   <?php echo $lang->ldap->userpass; ?>:</th>
                 <td class='w-p50 required'>
-                  <?php echo html::input('ldapUserPass', $config->
-                  ldap->userpass, "class='form-control' required placeholder='".$lang->ldap->userpass."'");?>
+                  <?php echo html::password('ldapUserPass', $config->
+                  ldap->userpass, "class='form-control' autocomplete=off required placeholder='".$lang->ldap->userpass."'");?>
                 </td>
                 <td class='w-p10'></td>
               </tr>
@@ -191,7 +188,7 @@ include '../../common/view/header.html.php';
         </form>
       </div>
       <div class="modal-footer">
-        <?php echo html::submitButton($lang->ldap->connect,''); ?>
+        <?php echo html::submitButton($lang->ldap->connect,'','btn btn-wide btn-primary ldap_testuser'); ?>
       </div>
     </div>
   </div>

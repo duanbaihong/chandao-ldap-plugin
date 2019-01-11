@@ -1,12 +1,10 @@
 <?php
 /**
- * The control file of user module of ZenTaoPMS.
+ * The model file of ldap module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2015 青岛易软天创网络科技有限公司(QingDao Nature Easy Soft Network Technology Co,LTD, www.cnezsoft.com)
- * @license     ZPL (http://zpl.pub/page/zplv11.html)
- * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
- * @package     user
- * @version     $Id: control.php 5005 2013-07-03 08:39:11Z chencongzhi520@gmail.com $
+ * @license     dbh ()
+ * @author      dbh888
+ * @package     ldap
  * @link        http://www.zentao.net
  */
 class ldap extends control
@@ -79,30 +77,32 @@ class ldap extends control
             $file = fopen("config.php", "w") or die("Unable to open file!");
             fwrite($file, $ldapConfig); 
             fclose($file); 
-
-            $this->locate(inlink('setting'));        
+            $this->display('ldap','setting');
+        }else{
+          $this->locate(inlink('setting'));
         }
     }
 
     public function test()
     {
-        $this->ldap->identify($this->get->host, $this->get->dn, $this->get->pwd);
+      if (!empty($_POST)) {
+        $postargs=$this->post;
+        $this->ldap->testconn($postargs->proto."://".$postargs->host,$postargs->port, $postargs->dn, $postargs->pwd,$postargs->version);
+      }else{
+        echo "请求非法！";
+      }
     }
-
+    public function usertest()
+    {
+      if (!empty($_POST)) {
+        $this->ldap->identify($this->post->ldapUserName,$this->post->ldapUserPass);
+      }else{
+        echo "请求非法！";
+      }
+    }
     public function sync()
     { 
       $groups = $this->ldap->syncGroups2db($this->config->ldap);
       echo $groups;
     }
-
-    // public function identify($user, $pwd)
-    // {
-    //     $ret = false;
-    //     $account = $this->config->ldap->uid.'='.$user.','.$this->config->ldap->baseDN;
-    //     if (0 == strcmp('Success', $this->ldap->identify($this->config->ldap->host, $account, $pwd))) {
-    //         $ret = true;
-    //     }
-
-    //     echo $ret;
-    // }
 }

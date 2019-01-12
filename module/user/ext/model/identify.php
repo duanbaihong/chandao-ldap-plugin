@@ -10,7 +10,6 @@ public function identify($account, $password)
         if ($record && empty($record->password)) {
             $ldap = $this->loadModel('ldap');
             $ldap_user = $ldap->identify($account, $password);
-            throw new Exception($ldap_user, 1);
             if (0 == strcmp('Success', $pass)) {
                 $user = $record;
                 $ip   = $this->server->remote_addr;

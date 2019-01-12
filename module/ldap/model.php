@@ -47,6 +47,10 @@ class ldapModel extends model
         // $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
 
     }
+    /**
+     * 效验参数
+     * @return [type] [description]
+     */
     protected function checkargs()
     {
         if(is_null($this->ldap_usermap) || empty($this->ldap_usermap)){
@@ -57,15 +61,13 @@ class ldapModel extends model
         if(is_null($this->ldap_groupmap) || empty($this->ldap_groupmap)){
             return $this->lang->ldap->chkGrpFieldErr;
         }
-        // if(!$this->ldap_bind){
-        //     return ldap_error($this->ldap_conn);
-        // }
         return true;
     }
-    public function identify($username,$userpass)
+    protected function userauth($username,$userpass)
     {
+        $chk=$this->checkargs();
+        if($chk !== true) return '{"code":"99999","results": "'.$chk.'"}';
         // user 映射
-        $ldap_user  = false;
         $usernamedn="{$this->ldap_usermap['account']}={$username},{$this->ldap_usersdn}";
         $user_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
         ldap_set_option($user_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
@@ -81,53 +83,110 @@ class ldapModel extends model
                 return ldap_error($user_conn);
             }
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
+            $write_user=$this->writeUsers($ldap_user,$username);
+            if(!is_object($write_user)) return $write_user;
             ldap_close($user_conn);
             // 获取用户组信息
             $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
             $ldap_group=$this->getGroups($group_filter);
+            if(!is_array($ldap_group)) return $ldap_group;
             if($this->ldap_config->syncGroups == 'true' && count($ldap_group)>0){
                 $this->writeGroupsInfo($ldap_group);
                 $this->writeUserGroups($ldap_group,$username);
             }
-        }elseif ($compare === false) {
-            echo "认证失败！";
-        }elseif ($compare === -1) {
-            echo "Error: " . ldap_error($ds);
+        }else{
+            return "Error: " . ldap_error($ds);
         }
         return $ldap_user;
     }
-    // LDAP用户数据写入数据库
-    protected function writeUsers($users=array())
+    /**
+     * 认证用户密码，通过就更新数据用户，并且同步更新用户的组信息！
+     * @param  [type] $username [用户名]
+     * @param  [type] $userpass [密码]
+     * @return [type]           [description]
+     */
+    public function identify($username,$userpass)
     {
-        # code...
+        echo $this->userauth($username,$userpass);
     }
-    // 写入组权限映射表usergroup
+    /**
+     * [writeUsers LDAP用户数据写入数据库]
+     * @param  array  $users [description]
+     * @return [type]        [description]
+     */
+    protected function writeUsers($users=array(),$username="")
+    {
+        if(empty($username) || count($users) == 0){
+            return "Param Error";
+        }
+        $record = $this->dao->select('*')->from(TABLE_USER)
+            ->where('account')->eq($username)
+            ->fetch();
+        $user=new stdClass();
+        foreach ($this->ldap_usermap as $k => $v) {
+            $user->$k=$users[0][$v][0];
+        }
+        $user->ip=$this->server->remote_addr;
+        $user->last=$this->server->request_time;
+        $user->deleted=0;
+        $user->last = date(DT_DATETIME1, $user->last);
+        if($record){
+            $user_update=$this->dao->update(TABLE_USER)
+                ->set('visits = visits + 1')
+                ->set('ip')->eq($user->ip)
+                ->set('last')->eq($user->last)
+                ->where('account')->eq($username)
+                ->where('deleted')->eq($user->deleted)
+                ->exec();
+        }else{
+            $user_insert=$this->dao->insert(TABLE_USER)->data($user)->autoCheck()->exec();
+        }
+        var_dump($user);
+        var_dump($user_insert);
+        return $user;
+    }
+    /**
+     * [写入组权限映射表usergroup]
+     * @param  array  $groupdata [获取到的group信息]
+     * @param  string $username  [用户名]
+     * @return [type]            [description]
+     */
     protected function writeUserGroups($groupdata=array(),$username="")
     {
-        # code...
+        if(empty($groupdata) || empty($username)){
+            return false;
+        }
+        $ldap_groupid=$this->ldap_groupmap['name'];
         $usergroup = new stdClass();
         for ($i=0; $i < $groupdata['count']; $i++) {
-            $usergroup->account=$username;
-            $usergroup->group  = $this->dao->select('*')
+            $group_id=$this->dao->select('*')
                 ->from(TABLE_GROUP)
-                ->where('name')->eq($groupdata[$i][$val][0])
+                ->where('name')->eq($groupdata[$i][$ldap_groupid][0])
                 ->fetch('id');
+            if(empty($group_id)) return "Falied";
+            $usergroup->account=$username;
+            $usergroup->group  = $group_id;
             $groupuser_map = $this->dao->select('*')
                 ->from(TABLE_USERGROUP)
                 ->where('account')->eq($usergroup->account)
-                ->andWhere('group')->eq($usergroup->group)
+                ->andWhere('`group`')->eq($usergroup->group)
                 ->fetch('account');
             if ($groupuser_map) {
                 continue;
             } else {
-                $this->dao->insert(TABLE_USERGROUP)->data($group)->autoCheck()->exec();
+                $this->dao->insert(TABLE_USERGROUP)->data($usergroup)->exec();
             }
         }
+        unset($usergroup);
+        return true;
     }
-    // 写入用户组信息到数据库
+    /**
+     * [writeGroupsInfo 写入用户组信息到数据库]
+     * @param  array  $groupdata [获取到的group信息]
+     */
     protected function writeGroupsInfo($groupdata=array())
     {
-        # code...
+        if(count($groupdata) == 0) return false;
         $this->syncNum=0;
         $group = new stdclass();
         for ($i=0; $i < $groupdata['count']; $i++) {
@@ -144,8 +203,13 @@ class ldapModel extends model
                 $this->syncNum+=1;
             }
         }
+        return true;
     }
-    // 获取全部组信息
+    /**
+     * [getGroups 获取全部组信息]
+     * @param  string $filter [过滤条件]
+     * @param  array  $attrs  [查询属性]
+     */
     protected function getGroups($filter="",$attrs=array())
     {
         $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
@@ -169,9 +233,17 @@ class ldapModel extends model
         $msg=sprintf($this->lang->ldap->findGroupsMsg,$ldapGroups['count'],$this->syncNum,$ldapGroups['count']-$this->syncNum);
         return '{"code": "00000","results": "'.$msg.'"}';
     }
+    /**
+     * [testconn 测试LDAP连接]
+     * @param  string  $addr [地址]
+     * @param  integer $port [端口]
+     * @param  string  $dn   [binddn]
+     * @param  string  $pwd  [密码]
+     * @param  integer $ver  [版本号]
+     */
     public function testconn($addr="",$port=389,$dn="",$pwd="",$ver=3)
     {
-        # code...
+        if(!$_POST) return "not post request!";
         $ret = '';
         $ds = ldap_connect($addr,$port);
         if ($ds) {
@@ -185,6 +257,7 @@ class ldapModel extends model
         }
         echo $ret;
     }
+    
     public function __destruct()
     {
         parent::__destruct();

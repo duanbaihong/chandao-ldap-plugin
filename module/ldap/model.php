@@ -57,13 +57,16 @@ class ldapModel extends model
             return $this->lang->ldap->chkUserFieldErr;
         }
         if(!array_key_exists('account',$this->ldap_usermap)) return $this->lang->ldap->chkUserFieldErr1;
+        if(!array_key_exists('realname',$this->ldap_usermap)) return $this->lang->ldap->chkUserFieldErr1;
+        if(!array_key_exists('email',$this->ldap_usermap)) return $this->lang->ldap->chkUserFieldErr1;
 
         if(is_null($this->ldap_groupmap) || empty($this->ldap_groupmap)){
             return $this->lang->ldap->chkGrpFieldErr;
         }
+        if(!array_key_exists('name',$this->ldap_groupmap)) return $this->lang->ldap->chkGrpFieldErr1;
         return true;
     }
-    protected function userauth($username,$userpass)
+    public function userauth($username,$userpass)
     {
         $chk=$this->checkargs();
         if($chk !== true) return '{"code":"99999","results": "'.$chk.'"}';
@@ -72,6 +75,7 @@ class ldapModel extends model
         $user_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
         ldap_set_option($user_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
         $user_bind=ldap_bind($user_conn,$usernamedn,$userpass);
+        $write_user="";
         if($user_bind){
             // 获取用户字段信息
             $ld_user_filter=sprintf($this->ldap_config->userFilter,$username);
@@ -84,8 +88,8 @@ class ldapModel extends model
             }
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
             $write_user=$this->writeUsers($ldap_user,$username);
-            if(!is_object($write_user)) return $write_user;
             ldap_close($user_conn);
+            if(!is_object($write_user)) return $write_user;
             // 获取用户组信息
             $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
             $ldap_group=$this->getGroups($group_filter);
@@ -95,9 +99,9 @@ class ldapModel extends model
                 $this->writeUserGroups($ldap_group,$username);
             }
         }else{
-            return "Error: " . ldap_error($ds);
+            return "Error: " . ldap_error($user_conn);
         }
-        return $ldap_user;
+        return $write_user;
     }
     /**
      * 认证用户密码，通过就更新数据用户，并且同步更新用户的组信息！
@@ -107,7 +111,14 @@ class ldapModel extends model
      */
     public function identify($username,$userpass)
     {
-        echo $this->userauth($username,$userpass);
+        $chk=$this->checkargs();
+        if($chk !== true) return $chk;
+        $user= $this->userauth($username,$userpass);
+        if(is_object($user)){
+            echo "Authentication Success!";
+        }else{
+            echo $user;
+        }
     }
     /**
      * [writeUsers LDAP用户数据写入数据库]
@@ -127,22 +138,20 @@ class ldapModel extends model
             $user->$k=$users[0][$v][0];
         }
         $user->ip=$this->server->remote_addr;
-        $user->last=$this->server->request_time;
-        $user->deleted=0;
-        $user->last = date(DT_DATETIME1, $user->last);
+        $user->deleted='0';
+        $user->join = date(DT_DATE1, $this->server->request_time);
+        $user->last = time();
         if($record){
             $user_update=$this->dao->update(TABLE_USER)
                 ->set('visits = visits + 1')
                 ->set('ip')->eq($user->ip)
                 ->set('last')->eq($user->last)
+                ->set('deleted')->eq($user->deleted)
                 ->where('account')->eq($username)
-                ->where('deleted')->eq($user->deleted)
                 ->exec();
         }else{
             $user_insert=$this->dao->insert(TABLE_USER)->data($user)->autoCheck()->exec();
         }
-        var_dump($user);
-        var_dump($user_insert);
         return $user;
     }
     /**

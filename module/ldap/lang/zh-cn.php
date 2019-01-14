@@ -27,13 +27,14 @@ $lang->ldap->username       = '用户名';
 $lang->ldap->userpass       = '密码';
 $lang->ldap->syncGroupBtn   = '手动同步所有组';
 $lang->ldap->save           = '保存设置';
+$lang->ldap->savesuccess    = 'LDAP设置保存成功！';
 $lang->ldap->test           = '连接测试';
 $lang->ldap->usertest       = '用户连接测试';
 $lang->ldap->connect        = '连接';
 $lang->ldap->userFieldMap   = '用户字段映射:';
 $lang->ldap->groupFieldMap  = '组字段映射:';
 $lang->ldap->chkUserFieldErr= '用户映射字段格式错误，非json格式.';
-$lang->ldap->chkUserFieldErr1= '用户映射缺少字段account字段.';
+$lang->ldap->chkUserFieldErr1= '用户映射缺少%s字段.';
 $lang->ldap->chkGrpFieldErr = '组映射字段格式错误，非json格式.';
 $lang->ldap->chkGrpFieldErr1= '组映射字段缺少name属性字段.';
 

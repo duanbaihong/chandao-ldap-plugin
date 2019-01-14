@@ -56,9 +56,9 @@ class ldapModel extends model
         if(is_null($this->ldap_usermap) || empty($this->ldap_usermap)){
             return $this->lang->ldap->chkUserFieldErr;
         }
-        if(!array_key_exists('account',$this->ldap_usermap)) return $this->lang->ldap->chkUserFieldErr1;
-        if(!array_key_exists('realname',$this->ldap_usermap)) return $this->lang->ldap->chkUserFieldErr1;
-        if(!array_key_exists('email',$this->ldap_usermap)) return $this->lang->ldap->chkUserFieldErr1;
+        if(!array_key_exists('account',$this->ldap_usermap)) return sprintf($this->lang->ldap->chkUserFieldErr1,'account');
+        if(!array_key_exists('realname',$this->ldap_usermap)) return sprintf($this->lang->ldap->chkUserFieldErr1,'realname');
+        if(!array_key_exists('email',$this->ldap_usermap)) return sprintf($this->lang->ldap->chkUserFieldErr1,'email');
 
         if(is_null($this->ldap_groupmap) || empty($this->ldap_groupmap)){
             return $this->lang->ldap->chkGrpFieldErr;
@@ -69,7 +69,7 @@ class ldapModel extends model
     public function userauth($username,$userpass)
     {
         $chk=$this->checkargs();
-        if($chk !== true) return '{"code":"99999","results": "'.$chk.'"}';
+        if($chk !== true) return $chk;
         // user 映射
         $usernamedn="{$this->ldap_usermap['account']}={$username},{$this->ldap_usersdn}";
         $user_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
@@ -87,7 +87,7 @@ class ldapModel extends model
                 return ldap_error($user_conn);
             }
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
-            $write_user=$this->writeUsers($ldap_user,$username);
+            $write_user=$this->writeUsers($ldap_user,$username,$userpass);
             ldap_close($user_conn);
             if(!is_object($write_user)) return $write_user;
             // 获取用户组信息
@@ -115,9 +115,9 @@ class ldapModel extends model
         if($chk !== true) return $chk;
         $user= $this->userauth($username,$userpass);
         if(is_object($user)){
-            echo "Authentication Success!";
+            return "Authentication Success!";
         }else{
-            echo $user;
+            return $user;
         }
     }
     /**
@@ -125,9 +125,9 @@ class ldapModel extends model
      * @param  array  $users [description]
      * @return [type]        [description]
      */
-    protected function writeUsers($users=array(),$username="")
+    protected function writeUsers($users=array(),$username="",$password="")
     {
-        if(empty($username) || count($users) == 0){
+        if(empty($username) || empty($password) || count($users) == 0){
             return "Param Error";
         }
         $record = $this->dao->select('*')->from(TABLE_USER)
@@ -139,6 +139,7 @@ class ldapModel extends model
         }
         $user->ip=$this->server->remote_addr;
         $user->deleted='0';
+        $user->password=md5(md5($password).$this->session->rand);
         $user->join = date(DT_DATE1, $this->server->request_time);
         $user->last = time();
         if($record){
@@ -146,6 +147,7 @@ class ldapModel extends model
                 ->set('visits = visits + 1')
                 ->set('ip')->eq($user->ip)
                 ->set('last')->eq($user->last)
+                ->set('password')->eq($user->password)
                 ->set('deleted')->eq($user->deleted)
                 ->where('account')->eq($username)
                 ->exec();

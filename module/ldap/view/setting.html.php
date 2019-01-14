@@ -9,6 +9,7 @@
  */
 include '../../common/view/header.html.php';
 ?>
+<?php echo $SaveSuccess?"<script>var message='{$SaveSuccess}';</script>":"" ?>
 <div class='container'>
   <div class="ldap_setting">
     <div id='titlebar'>
@@ -22,7 +23,7 @@ include '../../common/view/header.html.php';
       </div>
     </div>
     <!-- form-condensed -->
-    <form class='pdt-20' method='post' action='<?php echo inlink('save');?>
+    <form class='pdt-20' method='post' action='<?php echo inlink('setting');?>
       '>
       <table class='table table-form'>
         <tr>
@@ -69,7 +70,7 @@ include '../../common/view/header.html.php';
           <td></td>
           <td class="text-right">
             <label id='testRlt'></label>
-            <?php echo html::commonButton($lang->ldap->test, "onclick='javascript:onClickTest()' class='btn btn-danger'"); ?>
+            <?php echo html::commonButton($lang->ldap->test, "onclick='javascript:onClickTest(this)' class='btn btn-danger'"); ?>
           </td>
         </tr>
         <tr>
@@ -142,7 +143,7 @@ include '../../common/view/header.html.php';
             <?php 
             echo html::submitButton($lang->ldap->save);
             echo html::commonButton($lang->ldap->usertest, "href='#showModuleModal' data-toggle='modal'",'btn btn-warning');
-            echo html::commonButton($lang->ldap->syncGroupBtn,"onclick='javascript:syncGroups()'",'btn btn-success');
+            echo html::commonButton($lang->ldap->syncGroupBtn,"onclick='javascript:syncGroups(this)' data-loading-text='Loading...'",'btn btn-success');
             ?>
           </td>
         </tr>

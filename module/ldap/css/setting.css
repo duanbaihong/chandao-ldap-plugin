@@ -31,3 +31,25 @@
 .ldap_setting #ldapHost{
     width: 330px;
 }
+.ldap_setting .alert{
+    position: absolute;
+    margin: 0px auto;
+    width: 535px;
+    padding: 7px;
+    top: -4px;
+    left: 155px;
+    text-align: center;
+    right: 0px;
+    border: 1px solid #0e95f996;
+}
+#showModuleModal .alert{    
+    position: absolute;
+    margin: 0px auto;
+    width: 300px;
+    padding: 7px;
+    top: 13px;
+    left: 70px;
+    text-align: center;
+    right: 0px;
+    border: 1px solid #0e95f996;
+}

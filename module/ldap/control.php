@@ -29,15 +29,6 @@ class ldap extends control
 
     public function setting() 
     {
-        $this->view->title      = $this->lang->ldap->common . $this->lang->colon . $this->lang->ldap->setting;
-        $this->view->position[] = html::a(inlink('index'), $this->lang->ldap->common);
-        $this->view->position[] = $this->lang->ldap->setting;
-
-        $this->display();
-    }
-
-    public function save()
-    {
         if (!empty($_POST)) {
             $groupmap=addslashes($this->post->ldapGroupFieldMap);
             $usermap=addslashes($this->post->ldapUserFieldMap);
@@ -77,10 +68,12 @@ class ldap extends control
             $file = fopen("config.php", "w") or die("Unable to open file!");
             fwrite($file, $ldapConfig); 
             fclose($file); 
-            $this->display('ldap','setting');
-        }else{
-          $this->locate(inlink('setting'));
+            $this->view->SaveSuccess=$this->lang->ldap->savesuccess;
         }
+        $this->view->title      = $this->lang->ldap->common . $this->lang->colon . $this->lang->ldap->setting;
+        $this->view->position[] = html::a(inlink('index'), $this->lang->ldap->common);
+        $this->view->position[] = $this->lang->ldap->setting;
+        $this->display();
     }
 
     public function test()
@@ -95,7 +88,7 @@ class ldap extends control
     public function usertest()
     {
       if (!empty($_POST)) {
-        $this->ldap->identify($this->post->ldapUserName,$this->post->ldapUserPass);
+        echo $this->ldap->identify($this->post->ldapUserName,$this->post->ldapUserPass);
       }else{
         echo "请求非法！";
       }

@@ -139,7 +139,7 @@ class ldapModel extends model
         }
         $user->ip=$this->server->remote_addr;
         $user->deleted='0';
-        $user->password=md5(md5($password).$this->session->rand);
+        $user->password=md5($password);
         $user->join = date(DT_DATE1, $this->server->request_time);
         $user->last = time();
         if($record){

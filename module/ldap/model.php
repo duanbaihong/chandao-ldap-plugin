@@ -270,7 +270,7 @@ class ldapModel extends model
     
     public function __destruct()
     {
-        parent::__destruct();
+        // parent::__destruct();
         ldap_close($this->ldap_conn);
     }
 }

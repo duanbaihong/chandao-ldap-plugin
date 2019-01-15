@@ -40,7 +40,6 @@
     left: 155px;
     text-align: center;
     right: 0px;
-    border: 1px solid #0e95f996;
 }
 #showModuleModal .alert{    
     position: absolute;
@@ -51,5 +50,10 @@
     left: 70px;
     text-align: center;
     right: 0px;
+}
+.alert.alert-info{
     border: 1px solid #0e95f996;
+}
+.alert.alert-danger{
+    border: 1px solid #f62c2cbd;
 }

@@ -80,9 +80,9 @@ class ldap extends control
     {
       if (!empty($_POST)) {
         $postargs=$this->post;
-        $this->ldap->testconn($postargs->proto."://".$postargs->host,$postargs->port, $postargs->dn, $postargs->pwd,$postargs->version);
+        $this->ldap->testconn("{$postargs->proto}://{$postargs->host}:{$postargs->port}",$postargs->port, $postargs->dn, $postargs->pwd,$postargs->version);
       }else{
-        echo "请求非法！";
+        echo $this->lang->ldap->notpost;
       }
     }
     public function usertest()
@@ -90,7 +90,7 @@ class ldap extends control
       if (!empty($_POST)) {
         echo $this->ldap->identify($this->post->ldapUserName,$this->post->ldapUserPass);
       }else{
-        echo "请求非法！";
+        echo $this->lang->ldap->notpost;
       }
     }
     public function sync()

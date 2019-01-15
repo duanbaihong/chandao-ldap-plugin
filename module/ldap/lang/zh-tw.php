@@ -1,12 +1,10 @@
 <?php
 /**
- * The user module zh-tw file of ZenTaoPMS.
+ * The model file of ldap module of ZenTaoPMS.
  *
- * @copyright   Copyright 2009-2015 青島易軟天創網絡科技有限公司(QingDao Nature Easy Soft Network Technology Co,LTD, www.cnezsoft.com)
- * @license     ZPL (http://zpl.pub/page/zplv11.html)
- * @author      Chunsheng Wang <chunsheng@cnezsoft.com>
- * @package     user
- * @version     $Id: zh-tw.php 5053 2013-07-06 08:17:37Z wyd621@gmail.com $
+ * @license     dbh ()
+ * @author      dbh888
+ * @package     ldap
  * @link        http://www.zentao.net
  */
 
@@ -17,20 +15,32 @@ $lang->ldap->host           = 'LDAP服務器:';
 $lang->ldap->port           = '端口:';
 $lang->ldap->version        = '協議版本:';
 $lang->ldap->bindDN         = 'BindDN:';
-$lang->ldap->password       = 'BindDN 密碼:';
+$lang->ldap->password       = 'BindDN密碼:';
 $lang->ldap->baseDN         = 'BaseDN:';
 $lang->ldap->userSearchOU   = '用戶搜索OU:';
-$lang->ldap->userFilter     = '搜索過濾條件:';
+$lang->ldap->userFilter     = '搜索用戶過濾條件:';
 $lang->ldap->groupSearchOU  = '組搜索OU:';
 $lang->ldap->groupFilter    = '組搜索過濾條件:';
 $lang->ldap->groupField     = '組字段:';
-$lang->ldap->syncGroups     = '是否同步組名:';
-$lang->ldap->attributes     = '賬號字段:';
-// 
+$lang->ldap->syncGroups     = '是否自動同步組:';
 $lang->ldap->username       = '用戶名';
-$lang->ldap->password       = '密碼';
-$lang->ldap->sync           = '手動同步';
+$lang->ldap->userpass       = '密碼';
+$lang->ldap->syncGroupBtn   = '手動同步所有組';
 $lang->ldap->save           = '保存設置';
-$lang->ldap->test           = '測試連接';
-$lang->ldap->mail           = 'EMail字段:';
-$lang->ldap->name           = '姓名字段:';
+$lang->ldap->savesuccess    = 'LDAP設置保存成功！';
+$lang->ldap->test           = '連接測試';
+$lang->ldap->usertest       = '用戶連接測試';
+$lang->ldap->connect        = '連接';
+$lang->ldap->userFieldMap   = '用戶字段映射:';
+$lang->ldap->groupFieldMap  = '組字段映射:';
+$lang->ldap->chkUserFieldErr= '用戶映射字段格式錯誤，非json格式.';
+$lang->ldap->chkUserFieldErr1= '用戶映射缺少%s字段.';
+$lang->ldap->chkGrpFieldErr = '組映射字段格式錯誤，非json格式.';
+$lang->ldap->chkGrpFieldErr1= '組映射字段缺少name屬性字段.';
+$lang->ldap->notpost        = '非法請求，不是POST請求';
+
+$lang->ldap->syncLabels     = '同步組是是用來確定用戶權限，如果是首次同步，需要管理員設置此組的權限分配。';
+$lang->ldap->findGroupsMsg  = '找到%s個組信息，同步了個%s組信息,因本地存儲相同組名，跳過%s個組信息同步.';
+
+$lang->ldap->methodOrder[5] = 'index';
+$lang->ldap->methodOrder[10] = 'setting';

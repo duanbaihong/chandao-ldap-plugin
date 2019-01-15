@@ -39,7 +39,7 @@ class ldapModel extends model
         // 获取ＬＤＡＰ组字段映射
         $this->ldap_groupattrs=array_values($this->ldap_groupmap);
         // 格式连接地址参数
-        $this->ldap_protoaddr=$this->ldap_config->proto."://".$this->ldap_config->host;
+        $this->ldap_protoaddr="{$this->ldap_config->proto}://{$this->ldap_config->host}:{$this->ldap_config->port}";
         // 建立ＬＤＡＰ连接
         $this->ldap_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
         ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
@@ -69,7 +69,7 @@ class ldapModel extends model
     public function userauth($username,$userpass)
     {
         $chk=$this->checkargs();
-        if($chk !== true) return $chk;
+        if($chk !== true) return '{"code": "99999","results": "'.$chk.'"}';
         // user 映射
         $usernamedn="{$this->ldap_usermap['account']}={$username},{$this->ldap_usersdn}";
         $user_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
@@ -84,22 +84,22 @@ class ldapModel extends model
                 $ld_user_filter,
                 $this->ldap_userattrs);
             if(!$result_identifier){
-                return ldap_error($user_conn);
+                return '{"code": "99999","results": "'.ldap_error($user_conn).'"}';
             }
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
             $write_user=$this->writeUsers($ldap_user,$username,$userpass);
             ldap_close($user_conn);
-            if(!is_object($write_user)) return $write_user;
+            if(!is_object($write_user)) return '{"code": "99999","results": "'.$write_user.'"}';
             // 获取用户组信息
             $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
             $ldap_group=$this->getGroups($group_filter);
-            if(!is_array($ldap_group)) return $ldap_group;
+            if(!is_array($ldap_group)) return '{"code": "99999","results": "'.$ldap_group.'"';
             if($this->ldap_config->syncGroups == 'true' && count($ldap_group)>0){
                 $this->writeGroupsInfo($ldap_group);
                 $this->writeUserGroups($ldap_group,$username);
             }
         }else{
-            return "Error: " . ldap_error($user_conn);
+            return '{"code": "99999","results": "Error:'.ldap_error($user_conn).'"}';
         }
         return $write_user;
     }
@@ -112,10 +112,10 @@ class ldapModel extends model
     public function identify($username,$userpass)
     {
         $chk=$this->checkargs();
-        if($chk !== true) return $chk;
+        if($chk !== true) return '{"code": "99999","results": "'.$chk.'"}';
         $user= $this->userauth($username,$userpass);
         if(is_object($user)){
-            return "Authentication Success!";
+            return '{"code": "00000","results": "Authentication Success!"}';
         }else{
             return $user;
         }
@@ -254,9 +254,8 @@ class ldapModel extends model
      */
     public function testconn($addr="",$port=389,$dn="",$pwd="",$ver=3)
     {
-        if(!$_POST) return "not post request!";
         $ret = '';
-        $ds = ldap_connect($addr,$port);
+        $ds = ldap_connect($addr,(int)$port);
         if ($ds) {
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,$ver);
             ldap_bind($ds, $dn, $pwd);
@@ -266,7 +265,7 @@ class ldapModel extends model
         }  else {
             $ret = ldap_error($ds);
         }
-        echo $ret;
+        echo "{$ret}.{$addr}";
     }
     
     public function __destruct()
@@ -275,3 +274,4 @@ class ldapModel extends model
         ldap_close($this->ldap_conn);
     }
 }
+

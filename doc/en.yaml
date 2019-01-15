@@ -7,20 +7,19 @@ Author: 'dbh888 < duanbaihong@qq.com>'
 Abstract: >
   Support for synchronizing user information (account number, real name, mailbox) from LDAP servers and using LDAP to authenticate logins.
 Desc: >
-  1. After the plug-in is installed, there will be an additional "LDAP" sub-page in the background page where LDAP server information can be configured.
-  2. On the LDAP configuration page, you can test whether you can connect to the LDAP server properly.
-  3. After saving the configuration, click the "Manual Synchronization" button to synchronize user information from the LDAP server.
-  4. After synchronizing user information, LDAP users can log in to Zen Tao.
-  5. Local users log in to Zen Tao by adding a "$" sign before the account name.
+  1. After the plug-in is installed, there will be an additional "LDAP" sub-page in the background page where LDAP server information can be configured.<br>
+  2. On the LDAP configuration page, you can test whether you can connect to the LDAP server properly.<br>
+  3. After saving the configuration, click the "Manual Synchronization" button to synchronize user information from the LDAP server.<br>
+  4. After synchronizing user information, LDAP users can log in to Zen Tao.<br>
   6. Need to close the local password of Zen Road login page for HASH submission, comment a paragraph of JS can!
 Install: |
-  1. Installation through plug-in management of Zen Tao.
-    1.1 Log on to Zen Tao as administrator and access plug-in management.
-    1.2 Open the Access Plug-in page and search to find the plug-in.
-    1.3 Choose to install automatically and follow the page prompt.
+  1. Installation through plug-in management of Zen Tao.<br>
+    1.1 Log on to Zen Tao as administrator and access plug-in management.<br>
+    1.2 Open the Access Plug-in page and search to find the plug-in.<br>
+    1.3 Choose to install automatically and follow the page prompt.<br>
   2. Manual installation, decompression of the code, and then copy the directory to the corresponding directory of Zen Tao, such as module copy to zentao module.
 Releases:
-  1.2:
+  1.0:
     Zentao:
     Compatible: 7.0, 7.1, 7.2, 7.2.4, 7.2.5, 7.3,11.1
     Incompatible:
@@ -30,5 +29,5 @@ Releases:
     Depends: null
     Licens: LGPL
     Changelog: >
-      1. Increase support for traditional Chinese and English
+      1. Increase support for traditional Chinese and English<br>
       2. Increase support for privilege control

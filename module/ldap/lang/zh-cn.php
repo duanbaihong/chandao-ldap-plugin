@@ -37,6 +37,7 @@ $lang->ldap->chkUserFieldErr= '用户映射字段格式错误，非json格式.';
 $lang->ldap->chkUserFieldErr1= '用户映射缺少%s字段.';
 $lang->ldap->chkGrpFieldErr = '组映射字段格式错误，非json格式.';
 $lang->ldap->chkGrpFieldErr1= '组映射字段缺少name属性字段.';
+$lang->ldap->notpost        = '非法请求，不是POST请求';
 
 $lang->ldap->syncLabels     = '同步组是是用来确定用户权限，如果是首次同步，需要管理员设置此组的权限分配。';
 $lang->ldap->findGroupsMsg  = '找到%s个组信息，同步了个%s组信息,因本地存储相同组名，跳过%s个组信息同步.';

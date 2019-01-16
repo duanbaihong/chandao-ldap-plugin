@@ -9,7 +9,7 @@
  */
 include '../../common/view/header.html.php';
 ?>
-<?php echo $SaveSuccess?"<script>var message='{$SaveSuccess}';</script>":"" ?>
+<?php echo "<script>var message='".($SaveSuccess??'')."';</script>" ?>
 <div class='container'>
   <div class="ldap_setting">
     <div id='titlebar'>
@@ -101,7 +101,7 @@ include '../../common/view/header.html.php';
           <th>
             <?php echo $lang->ldap->userFieldMap; ?></th>
           <td class='w-p50 required'>
-            <?php echo html::input('ldapUserFieldMap', stripslashes($config->ldap->userFieldMap), "class='form-control' required=required placeholder=\"{'account': 'uid','email': 'mail','realname':'sn','mobile':'phone'}\"");?></td>
+            <?php echo html::input('ldapUserFieldMap', stripslashes($config->ldap->userFieldMap), "class='form-control' required=required placeholder='{\"account\": \"uid\",\"email\": \"mail\",\"realname\":\"sn\",\"mobile\":\"phone'}'");?></td>
         </tr>
         <tr>
           <th>

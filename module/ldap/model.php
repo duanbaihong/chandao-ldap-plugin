@@ -69,7 +69,7 @@ class ldapModel extends model
     public function userauth($username,$userpass)
     {
         $chk=$this->checkargs();
-        if($chk !== true) return '{"code": "99999","results": "'.$chk.'"}';
+        if($chk !== true) return array("code"=>"99999","results"=>$chk);
         // user 映射
         $usernamedn="{$this->ldap_usermap['account']}={$username},{$this->ldap_usersdn}";
         $user_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
@@ -84,7 +84,7 @@ class ldapModel extends model
                 $ld_user_filter,
                 $this->ldap_userattrs);
             if(!$result_identifier){
-                return '{"code": "99999","results": "'.ldap_error($user_conn).'"}';
+                return array("code"=>"99999","results"=>ldap_error($user_conn));
             }
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
             $write_user=$this->writeUsers($ldap_user,$username,$userpass);
@@ -95,11 +95,17 @@ class ldapModel extends model
             $ldap_group=$this->getGroups($group_filter);
             if(!is_array($ldap_group)) return '{"code": "99999","results": "'.$ldap_group.'"';
             if($this->ldap_config->syncGroups == 'true' && count($ldap_group)>0){
-                $this->writeGroupsInfo($ldap_group);
-                $this->writeUserGroups($ldap_group,$username);
+                $saveGroups=$this->writeGroupsInfo($ldap_group);
+                if($saveGroups != true){
+                   return array("code"=>"99999","results"=>$saveGroups);
+                }
+                $saveUserGroups=$this->writeUserGroups($ldap_group,$username);
+                if($saveGroups != true){
+                   return array("code"=>"99999","results"=>$saveUserGroups);
+                }
             }
         }else{
-            return '{"code": "99999","results": "Error:'.ldap_error($user_conn).'"}';
+            return array("code"=>"99999","results"=>ldap_error($user_conn));
         }
         return $write_user;
     }
@@ -112,10 +118,10 @@ class ldapModel extends model
     public function identify($username,$userpass)
     {
         $chk=$this->checkargs();
-        if($chk !== true) return '{"code": "99999","results": "'.$chk.'"}';
+        if($chk !== true) return array("code"=>"99999","results"=>$chk);
         $user= $this->userauth($username,$userpass);
         if(is_object($user)){
-            return '{"code": "00000","results": "Authentication Success!"}';
+            return array("code"=>"00000","results"=>"Authentication Success!");
         }else{
             return $user;
         }
@@ -169,12 +175,14 @@ class ldapModel extends model
         }
         $ldap_groupid=$this->ldap_groupmap['name'];
         $usergroup = new stdClass();
+        $remote_ldapgroupmap=array();
         for ($i=0; $i < $groupdata['count']; $i++) {
             $group_id=$this->dao->select('*')
                 ->from(TABLE_GROUP)
                 ->where('name')->eq($groupdata[$i][$ldap_groupid][0])
                 ->fetch('id');
             if(empty($group_id)) return "Falied";
+            $remote_ldapgroupmap[]=$group_id;
             $usergroup->account=$username;
             $usergroup->group  = $group_id;
             $groupuser_map = $this->dao->select('*')
@@ -188,7 +196,22 @@ class ldapModel extends model
                 $this->dao->insert(TABLE_USERGROUP)->data($usergroup)->exec();
             }
         }
-        unset($usergroup);
+        // 删除不存在关联的组映射！
+        $local_groupmap=$this->dao->select('*')
+                ->from(TABLE_USERGROUP)
+                ->where('account')->eq($username)
+                ->fetchPairs('group');
+        $local_diffmap=array_diff($local_groupmap,$remote_ldapgroupmap);
+        if(!is_null($local_diffmap) && count($local_groupmap)>0){
+            $this->dao->delete()->from(TABLE_USERGROUP)
+                ->where('account')->eq($username)
+                ->andWhere('`group`')->in($local_diffmap)->exec();
+        }
+        if($this->dao::isError()){
+            $response['code']='99999';
+            $response['results']=dao::getError();
+            $this->send($response);
+        }
         return true;
     }
     /**
@@ -237,12 +260,12 @@ class ldapModel extends model
     public function syncGroups2db()
     {
         $chk=$this->checkargs();
-        if($chk !== true) return '{"code":"99999","results": "'.$chk.'"}';
+        if($chk !== true) return array("code"=>"99999","results"=>$chk);
         $ldapGroups = $this->getGroups();
-        if(!is_array($ldapGroups)) return '{"code":"99999","results": "'.$ldapGroups.'"}';
+        if(!is_array($ldapGroups)) return array("code"=>"99999","results"=>$ldapGroups);
         $this->writeGroupsInfo($ldapGroups);
         $msg=sprintf($this->lang->ldap->findGroupsMsg,$ldapGroups['count'],$this->syncNum,$ldapGroups['count']-$this->syncNum);
-        return '{"code": "00000","results": "'.$msg.'"}';
+        return array("code"=>"00000","results"=>$msg);
     }
     /**
      * [testconn 测试LDAP连接]

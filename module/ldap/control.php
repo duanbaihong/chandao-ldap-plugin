@@ -88,14 +88,15 @@ class ldap extends control
     public function usertest()
     {
       if (!empty($_POST)) {
-        echo $this->ldap->identify($this->post->ldapUserName,$this->post->ldapUserPass);
+        $auth_user=$this->ldap->identify($this->post->ldapUserName,$this->post->ldapUserPass);
+        $this->send($auth_user);
       }else{
-        echo $this->lang->ldap->notpost;
+        $this->send(array("code"=>"99999","results"=>$this->lang->ldap->notpost)); 
       }
     }
     public function sync()
     { 
       $groups = $this->ldap->syncGroups2db($this->config->ldap);
-      echo $groups;
+      $this->send($groups); 
     }
 }

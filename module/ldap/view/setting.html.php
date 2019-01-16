@@ -27,7 +27,7 @@ include '../../common/view/header.html.php';
       '>
       <table class='table table-form'>
         <tr>
-          <th>
+          <th class="w-p15">
             <?php echo $lang->ldap->host; ?></th>
           <td class='w-p50 required'>
             <div class='input-group'>

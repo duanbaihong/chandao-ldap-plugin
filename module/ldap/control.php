@@ -32,6 +32,7 @@ class ldap extends control
         if (!empty($_POST)) {
             $groupmap=addslashes($this->post->ldapGroupFieldMap);
             $usermap=addslashes($this->post->ldapUserFieldMap);
+            $this->config->ldap->ldapOpen      = $this->post->ldapOpen;
             $this->config->ldap->proto         = $this->post->ldapProto;
             $this->config->ldap->host          = $this->post->ldapHost;
             $this->config->ldap->port          = $this->post->ldapPort;
@@ -50,6 +51,7 @@ class ldap extends control
             // 此处我们把配置写入配置文件
             $ldapConfig = "<?php \n"
                           ."\$config->ldap = new stdclass();\n"
+                          ."\$config->ldap->ldapOpen = '{$this->post->ldapOpen}';\n"
                           ."\$config->ldap->proto = '{$this->post->ldapProto}';\n"
                           ."\$config->ldap->host = '{$this->post->ldapHost}';\n"
                           ."\$config->ldap->port = '{$this->post->ldapPort}';\n"

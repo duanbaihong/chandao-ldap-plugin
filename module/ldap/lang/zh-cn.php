@@ -10,6 +10,7 @@
 
 $lang->ldap->common         = "LDAP";
 $lang->ldap->setting        = "设置";
+$lang->ldap->open 			= "开启LDAP认证";
 $lang->ldap->proto          = 'LDAP协议:';
 $lang->ldap->host           = 'LDAP服务器:';
 $lang->ldap->port           = '端口:';

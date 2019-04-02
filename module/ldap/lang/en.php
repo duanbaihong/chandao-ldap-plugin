@@ -11,6 +11,7 @@
 $lang->ldap->common = "LDAP";
 $lang->ldap->setting = "Settings";
 $lang->ldap->proto = 'LDAP protocol:';
+$lang->ldap->open  = "Enable LDAP:";
 $lang->ldap->host = 'LDAP Server:';
 $lang->ldap->port = 'port:';
 $lang->ldap->version = 'Protocol version:';

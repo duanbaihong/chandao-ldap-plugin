@@ -19,7 +19,7 @@ install: |
     1.3 選擇自動安裝，按照頁面提示即可。<br>
   2. 手工安裝，將代碼解壓縮，然後將目錄拷貝到禪道對應的目錄，比如module拷貝到zentao的module。
 releases:
-  1.0:
+  1.1:
     zentao:
       compatible: 7.0,7.1,7.2,7.2.4,7.2.5,7.3,11.1
       incompatible:

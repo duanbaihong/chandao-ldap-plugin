@@ -22,7 +22,7 @@ include '../../common/view/header.html.php';
         <?php echo html::icon('cog');?></small>
     </div>
   </div>
-  <?php if(!function_exists('ldap_connect')) { ?>
+  <?php $has_ldap=function_exists('ldap_connect'); if(!$has_ldap) { ?>
     <div class="alert alert-danger" role="alert">
       <?php echo $lang->ldap->notmodule; ?>
     </div>
@@ -37,7 +37,7 @@ include '../../common/view/header.html.php';
         <th class="w-p50" style="text-align: left;padding: 15px 5px;">
           <div class="checkbox-primary inline-block">
             <input type="checkbox" name="ldapOpen" value="true"  <?php if($config->
-            ldap->ldapOpen) echo "checked='checked'"?> <?php if(!function_exists('ldap_connect')) echo 'disabled'; ?>  id="ldapOpen">
+            ldap->ldapOpen) echo "checked='checked'"?> <?php if(!$has_ldap) echo 'disabled'; ?>  id="ldapOpen">
             <label for="ldapOpen">
               <?php echo $lang->ldap->no; ?></label>
           </div>
@@ -132,7 +132,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->groupSearchOU; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapGroupOU', $config->
-          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=groups'");?>
+          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=groups'".($has_ldap?'':' disabled'));?>
         </td>
       </tr>
       <tr>

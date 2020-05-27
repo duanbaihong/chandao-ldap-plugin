@@ -11,7 +11,7 @@ public function identify($account, $password)
 		}
 	    if(!is_object($user)){
 	        $user = parent::identify($account, $password);
-	        echo "dao"
+	        echo "dao";
 	    }
 	}else{
 		$user = parent::identify($account, $password);

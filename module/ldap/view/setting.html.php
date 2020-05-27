@@ -92,7 +92,7 @@ include '../../common/view/header.html.php';
         <td class="text-right">
           <label id='testRlt'></label>
           <?php echo html::commonButton($lang->
-          ldap->test, "onclick='javascript:onClickTest(this)' class='btn btn-danger'"); ?>
+          ldap->test, "onclick='javascript:onClickTest(this)' class='btn btn-danger'".($has_ldap?'':' disabled')); ?>
         </td>
       </tr>
       <tr>
@@ -132,7 +132,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->groupSearchOU; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapGroupOU', $config->
-          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=groups'".($has_ldap?'':' disabled'));?>
+          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=groups'");?>
         </td>
       </tr>
       <tr>

@@ -41,8 +41,8 @@ class ldapModel extends model
         // 格式连接地址参数
         $this->ldap_protoaddr="{$this->ldap_config->proto}://{$this->ldap_config->host}:{$this->ldap_config->port}";
         // 建立ＬＤＡＰ连接
-        $this->ldap_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
-        ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
+        $this->ldap_conn=@ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
+        @ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
         // bind dn
         // $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
 

@@ -16,6 +16,6 @@ public function identify($account, $password)
 	}else{
 		$user = parent::identify($account, $password);
 	}
-	return false;
+	die('');
     return $user;
 }

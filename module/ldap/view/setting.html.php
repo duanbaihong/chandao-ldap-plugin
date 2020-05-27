@@ -22,6 +22,11 @@ include '../../common/view/header.html.php';
         <?php echo html::icon('cog');?></small>
     </div>
   </div>
+  <?php if(!function_exists('ldap_connect')) { ?>
+    <div class="alert alert-danger" role="alert">
+      <?php echo $lang->ldap->notmodule; ?>
+    </div>
+  <?php } ?>
   <!-- form-condensed -->
   <form class='pdt-20' method='post' action='<?php echo inlink('setting');?>
     '>

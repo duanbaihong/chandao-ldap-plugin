@@ -8,6 +8,7 @@
  * @link http://www.zentao.net
  */
 
+$lang->ldap->notmodule        = "The extension module for PHP LDAP is not installed";
 $lang->ldap->common           = "LDAP";
 $lang->ldap->setting          = "Settings";
 $lang->ldap->proto            = 'LDAP protocol:';

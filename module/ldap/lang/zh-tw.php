@@ -7,7 +7,7 @@
  * @package     ldap
  * @link        http://www.zentao.net
  */
-
+$lang->ldap->notmodule        = "未安裝php-ldap的擴展模組.";
 $lang->ldap->common           = "LDAP";
 $lang->ldap->setting          = "設置";
 $lang->ldap->proto            = 'LDAP協議:';

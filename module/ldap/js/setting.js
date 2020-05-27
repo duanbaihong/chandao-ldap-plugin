@@ -78,7 +78,7 @@ $("#ldapProto").change(function() {
     if(val=='ldaps') port=636
     $("#ldapPort").val(port)
 })
-var html="<div class='alert fade' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>×</span></button></div>";
+var html="<div class='alert fade' role='alert'><span class='costomer_close close icon-close' data-dismiss='alert' aria-label='Close'></span></div>";
 var popoIndex=1000
 var alert_msgObj=[];
 $(document).ready(function () {

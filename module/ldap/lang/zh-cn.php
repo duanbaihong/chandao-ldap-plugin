@@ -8,6 +8,7 @@
  * @link        http://www.zentao.net
  */
 
+$lang->ldap->notmodule        = "未安装php-ldap的扩展模块.";
 $lang->ldap->common           = "LDAP";
 $lang->ldap->setting          = "设置";
 $lang->ldap->open             = "开启LDAP认证";

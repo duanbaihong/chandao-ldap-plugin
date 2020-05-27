@@ -21,10 +21,10 @@ Install: |
 Releases:
   1.1:
     Zentao:
-    Compatible: 7.0, 7.1, 7.2, 7.2.4, 7.2.5, 7.3, 11.1, 12.3
+    Compatible: 7.0, 7.1, 7.2, 7.2.4, 7.2.5, 7.3, 11.1, 12.3, 12.3.1
     Incompatible:
     Charge: free
-    Date: 2015-10-16
+    Date: 2020-05-27
     Conflicts: null
     Depends: null
     Licens: LGPL

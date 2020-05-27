@@ -22,7 +22,7 @@ include '../../common/view/header.html.php';
         <?php echo html::icon('cog');?></small>
     </div>
   </div>
-  <?php if(!function_exists('ldap_connect')) { ?>
+  <?php if(@!function_exists('ldap_connect')) { ?>
     <div class="alert alert-danger" role="alert">
       <?php echo $lang->ldap->notmodule; ?>
     </div>

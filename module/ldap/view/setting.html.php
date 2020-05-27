@@ -37,7 +37,7 @@ include '../../common/view/header.html.php';
         <th class="w-p50" style="text-align: left;padding: 15px 5px;">
           <div class="checkbox-primary inline-block">
             <input type="checkbox" name="ldapOpen" value="true"  <?php if($config->
-            ldap->ldapOpen) echo "checked='checked'"?>  id="ldapOpen">
+            ldap->ldapOpen) echo "checked='checked'"?> <?php if(!function_exists('ldap_connect')) echo 'disabled'; ?>  id="ldapOpen">
             <label for="ldapOpen">
               <?php echo $lang->ldap->no; ?></label>
           </div>

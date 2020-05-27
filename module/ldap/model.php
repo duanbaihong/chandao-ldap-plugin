@@ -23,9 +23,8 @@ class ldapModel extends model
     public function __construct()
     {
         parent::__construct();
-        if(!function_exists('ldap_connect')) {
-            return false;
-        }
+        if(!function_exists('ldap_connect')) return false;
+        
         $this->ldap_config=$this->config->ldap;
         // 用户BASEＤＮ拼接
         $this->ldap_usersdn="{$this->ldap_config->userSearchOU},{$this->ldap_config->baseDN}";
@@ -280,6 +279,7 @@ class ldapModel extends model
      */
     public function testconn($addr="",$port=389,$dn="",$pwd="",$ver=3)
     {
+        if(!function_exists('ldap_connect')) return false;
         $ret = '';
         $ds = ldap_connect($addr,(int)$port);
         if ($ds) {

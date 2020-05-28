@@ -261,6 +261,9 @@ class ldapModel extends model
              return ldap_error($this->ldap_conn);
         }
         $data = ldap_get_entries($this->ldap_conn, $rlt);
+        if($data['count']==0){
+            return $this->lang->ldap->notfoundGroup;
+        }
         return $data;
     }
     public function syncGroups2db()

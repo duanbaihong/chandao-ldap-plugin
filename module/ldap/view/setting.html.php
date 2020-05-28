@@ -186,7 +186,7 @@ include '../../common/view/header.html.php';
       <button type="button" class="close" data-dismiss="modal"> <i class="icon icon-close"></i>
       </button>
       <h4 class="modal-title"> <i class="icon-cog"></i>
-        测试LDAP用户连接
+        <?php echo $lang->ldap->testLDAPConnect ?>
       </h4>
     </div>
     <div class="modal-body">

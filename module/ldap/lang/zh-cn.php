@@ -43,6 +43,7 @@ $lang->ldap->notpost          = '非法请求，不是POST请求';
 
 $lang->ldap->syncLabels       = '同步组是是用来确定用户权限，如果是首次同步，需要管理员设置此组的权限分配。';
 $lang->ldap->findGroupsMsg    = '找到%s个组信息，同步了个%s组信息,因本地存储相同组名，跳过%s个组信息同步.';
+$lang->ldap->testLDAPConnect  = '测试LDAP用户连接';
 $lang->ldap->notfoundGroup    = '没有找到用户组相关信息.';
 
 $lang->ldap->methodOrder[5]   = 'index';

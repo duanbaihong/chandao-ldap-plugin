@@ -43,6 +43,7 @@ $lang->ldap->notpost          = 'Illegal request, not POST request';
 
 $lang->ldap->syncLabels       = 'The sync group is used to determine user permissions. If it is the first sync, the administrator needs to set the permissions assignment for this group. ';
 $lang->ldap->findGroupsMsg    = 'Found %s group information, synchronized %s group information, because the same group name is stored locally, skip %s group information synchronization.';
+$lang->ldap->testLDAPConnect  = 'Test LDAP user connection';
 $lang->ldap->notfoundGroup    = 'No user group related information was found';
 
 $lang->ldap->methodOrder[5]   = 'index';

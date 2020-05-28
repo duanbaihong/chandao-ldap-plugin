@@ -89,13 +89,17 @@ class ldapModel extends model
                 return array("code"=>"99999","results"=>ldap_error($user_conn));
             }
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
-            $write_user=$this->writeUsers($ldap_user,$username,$userpass);
-            ldap_close($user_conn);
-            if(!is_object($write_user)) return '{"code": "99999","results": "'.$write_user.'"}';
+
             // 获取用户组信息
             $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
             $ldap_group=$this->getGroups($group_filter);
             if(!is_array($ldap_group)) return array("code"=>"99999","results"=>$ldap_group);
+            // 如果找到组信息就保存用户数据，未找到就不保存。
+            $write_user=$this->writeUsers($ldap_user,$username,$userpass);
+            if(!is_object($write_user)) return '{"code": "99999","results": "'.$write_user.'"}';
+            // 关闭LDAP连接
+            ldap_close($user_conn);
+            // 同步组信息
             if($this->ldap_config->syncGroups == 'true' && count($ldap_group)>0){
                 $saveGroups=$this->writeGroupsInfo($ldap_group);
                 if($saveGroups != true){

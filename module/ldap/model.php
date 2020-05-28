@@ -160,7 +160,7 @@ class ldapModel extends model
                 ->set('deleted')->eq($user->deleted);
             foreach ($this->ldap_usermap as $k => $v) {
                 if( $k == 'account' || $k == 'password' ) continue;
-                $user_update->set($k)->eq(users[0][$v][0]);
+                $user_update->set($k)->eq($users[0][$v][0]);
             }
             $user_update->where('account')->eq($username)->exec();
         }else{

@@ -1,3 +1,6 @@
+// Prevent login page show in a iframe modal
+if(window.self !== window.top) window.top.location.href = window.location.href;
+
 $(document).ready(function()
 {
     /* Fix bug for misc-ping */

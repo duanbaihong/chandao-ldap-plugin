@@ -148,7 +148,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->groupFieldMap; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapGroupFieldMap', stripslashes($config->
-          ldap->groupFieldMap), "class='form-control' required=required placeholder='{\"name\":\"cn\",\"desc\":\"description\"}'");?>
+          ldap->groupFieldMap), "class='form-control' required=required placeholder='{\"name\":\"cn\",\"desc\":\"description\",\"role\":\"cn\"}'");?>
         </td>
       </tr>
       <tr>

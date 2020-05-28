@@ -124,7 +124,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->userFieldMap; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapUserFieldMap', stripslashes($config->
-          ldap->userFieldMap), "class='form-control' required=required placeholder='{\"account\": \"uid\",\"email\": \"mail\",\"realname\":\"sn\",\"mobile\":\"phone'}'");?>
+          ldap->userFieldMap), "class='form-control' required=required placeholder='{\"account\": \"uid\",\"email\": \"mail\",\"realname\":\"sn\",\"mobile\":\"mobile\"}'");?>
         </td>
       </tr>
       <tr>
@@ -148,7 +148,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->groupFieldMap; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapGroupFieldMap', stripslashes($config->
-          ldap->groupFieldMap), "class='form-control' required=required placeholder=\"{'name':'cn','desc':'description'}\"");?>
+          ldap->groupFieldMap), "class='form-control' required=required placeholder='{\"name\":\"cn\",\"desc\":\"description\"}'");?>
         </td>
       </tr>
       <tr>

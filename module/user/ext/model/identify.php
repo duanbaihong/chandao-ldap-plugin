@@ -3,7 +3,6 @@ public function identify($account, $password)
 {
 	$user=false; 
     $ldap = $this->loadModel('ldap');
-    echo $this->config->ldap->ldapOpen;
 	if($this->config->ldap->ldapOpen){ 
 		if($account!="admin"){
 		    $user = $ldap->userauth($account, $password);

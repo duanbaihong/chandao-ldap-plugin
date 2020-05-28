@@ -95,7 +95,7 @@ class ldapModel extends model
             // 获取用户组信息
             $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
             $ldap_group=$this->getGroups($group_filter);
-            if(!is_array($ldap_group)) return '{"code": "99999","results": "'.$ldap_group.'"';
+            if(!is_array($ldap_group)) return array("code"=>"99999","results"=>$ldap_group);
             if($this->ldap_config->syncGroups == 'true' && count($ldap_group)>0){
                 $saveGroups=$this->writeGroupsInfo($ldap_group);
                 if($saveGroups != true){

@@ -302,7 +302,7 @@ class ldapModel extends model
         }  else {
             $ret = ldap_error($ds);
         }
-        echo "{$ret}.{$addr}";
+        return $ret;
     }
     
     public function __destruct()

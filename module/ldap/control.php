@@ -82,9 +82,14 @@ class ldap extends control
     {
       if (!empty($_POST)) {
         $postargs=$this->post;
-        $this->ldap->testconn("{$postargs->proto}://{$postargs->host}:{$postargs->port}",$postargs->port, $postargs->dn, $postargs->pwd,$postargs->version);
+        $test_status=$this->ldap->testconn("{$postargs->proto}://{$postargs->host}:{$postargs->port}",$postargs->port, $postargs->dn, $postargs->pwd,$postargs->version);
+        if($test_status == "Success"){
+          $this->send(array("code"=>"00000","results"=>$test_status)); 
+        }else{
+          $this->send(array("code"=>"99999","results"=>$test_status)); 
+        }
       }else{
-        echo $this->lang->ldap->notpost;
+        $this->send(array("code"=>"99999","results"=>$this->lang->ldap->notpost)); 
       }
     }
     public function usertest()

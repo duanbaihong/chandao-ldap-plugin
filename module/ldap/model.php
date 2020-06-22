@@ -45,6 +45,7 @@ class ldapModel extends model
         // 建立ＬＤＡＰ连接
         $this->ldap_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
         ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
+        ldap_set_option($this->ldap_conn,LDAP_OPT_NETWORK_TIMEOUT,10);
         // bind dn
         // $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
 
@@ -295,6 +296,7 @@ class ldapModel extends model
         $ds = ldap_connect($addr,(int)$port);
         if ($ds) {
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,$ver);
+            ldap_set_option($ds,LDAP_OPT_NETWORK_TIMEOUT,10);
             ldap_bind($ds, $dn, $pwd);
 
             $ret = ldap_error($ds);

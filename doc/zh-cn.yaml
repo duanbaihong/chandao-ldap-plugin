@@ -21,7 +21,7 @@ install: |
 releases:
   1.1:
     zentao:
-      compatible: 11.1,12.3,12.3.1
+      compatible: 11.1,12.3,12.3.1,12.3.2
       incompatible:
     charge: free
     date: 2020-05-27

@@ -62,3 +62,16 @@
 .alert.alert-danger{
     border: 1px solid #f62c2cbd;
 }
+.has_enable_tls {
+    display: none;
+}
+.has_enable_tls.enable {
+    display: table-row;
+}
+.ldap_upload_file_btn {
+    position: absolute;
+}
+input[type='file'] {
+    outline: none;
+    padding: 3px;
+}

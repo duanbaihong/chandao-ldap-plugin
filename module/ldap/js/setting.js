@@ -62,9 +62,17 @@ $(".ldap_testuser").click(function() {
 $("#ldapProto").change(function() {
     var val=$(this).val()
     var port=389
-    if(val=='ldap') port=389
-    if(val=='ldaps') port=636
+    var tls=$(".has_enable_tls")
+    if(val=='ldap') {
+        port=389
+        tls.removeClass('enable')
+    }
+    if(val=='ldaps'){
+        port=636
+        tls.addClass('enable')
+    }
     $("#ldapPort").val(port)
+    
 })
 var html="<div class='alert fade' role='alert'><span class='costomer_close close icon-close' data-dismiss='alert' aria-label='Close'></span></div>";
 var popoIndex=1000

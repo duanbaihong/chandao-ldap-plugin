@@ -27,6 +27,25 @@ class ldap extends control
         $this->locate(inlink('setting'));
     }
 
+    /**
+     * setting of ldap.
+     *
+     * @param  boolean  $ldapOpen
+     * @param  string   $ldapProto
+     * @param  string   $ldapHost
+     * @param  string   $ldapPort
+     * @param  string   $ldapBindDN
+     * @param  string   $ldapPassword
+     * @param  string   $ldapBaseDN
+     * @param  string   $ldapUserOU
+     * @param  string   $ldapUserFilter
+     * @param  string   $ldapGroupOU
+     * @param  string   $ldapGroupFilter
+     * @param  boolean  $ldapSyncGroups
+     * @param  int      $ldapVersion
+     * @access public
+     * @return public
+    */
     public function setting() 
     {
         if (!empty($_POST)) {
@@ -50,6 +69,7 @@ class ldap extends control
 
             // 此处我们把配置写入配置文件
             $ldapConfig = "<?php \n"
+                          ."try {\n"
                           ."\$config->ldap = new stdclass();\n"
                           ."\$config->ldap->ldapOpen = '{$this->post->ldapOpen}';\n"
                           ."\$config->ldap->proto = '{$this->post->ldapProto}';\n"
@@ -65,11 +85,39 @@ class ldap extends control
                           ."\$config->ldap->groupFilter = '{$this->post->ldapGroupFilter}';\n"
                           ."\$config->ldap->syncGroups = '{$this->post->ldapSyncGroups}';\n"
                           ."\$config->ldap->groupFieldMap = '{$groupmap}';\n"
-                          ."\$config->ldap->userFieldMap = '{$usermap}';\n";
+                          ."\$config->ldap->userFieldMap = '{$usermap}';\n"
+                          ."\$config->ldap->caCert = '{$this->post->ldapCACert}';\n"
+                          ."\$config->ldap->clientKey = '{$this->post->ldapClientKey}';\n"
+                          ."\$config->ldap->clientCert = '{$this->post->ldapClientCert}';\n"
+                          ."} catch (Exception \$e) { \n"
+                          ."\techo '加载LDAP配置出错！'; \n"
+                          ."}";
 
             $file = fopen("config.php", "w") or die("Unable to open file!");
             fwrite($file, $ldapConfig); 
             fclose($file); 
+            $newConfig=new stdclass();
+            $newConfig->configid='0';
+            $newConfig->ldapopen=$this->post->ldapOpen=='true'?'true':'false';
+            $newConfig->proto=$this->post->ldapProto;
+            $newConfig->host=$this->post->ldapHost;
+            $newConfig->port=$this->post->ldapPort;
+            $newConfig->version=$this->post->ldapVersion;
+            $newConfig->binddn=$this->post->ldapBindDN;
+            $newConfig->bindpass=base64_encode($this->post->ldapPassword);
+            $newConfig->basedn=$this->post->ldapBaseDN;
+            $newConfig->userou=$this->post->ldapUserOU;
+            $newConfig->userfilter=$this->post->ldapUserFilter;
+            $newConfig->groupou=$this->post->ldapGroupOU;
+            $newConfig->groupfilter=$this->post->ldapGroupFilter;
+            $newConfig->syncgroups=$this->post->ldapSyncGroups=='true'?'true':'false';
+            $newConfig->usermap=$usermap;
+            $newConfig->groupmap=$groupmap;
+            $newConfig->tls=$this->post->ldapProto=='ldaps'?'true':'false';
+            $newConfig->cacert=$this->post->ldapCACert;
+            $newConfig->clientkey=$this->post->ldapClientKey;
+            $newConfig->clientcert=$this->post->ldapClientCert;
+            $this->dao->replace($this->config->db->prefix.'ldap')->data($newConfig)->exec();
             $this->view->SaveSuccess=$this->lang->ldap->savesuccess;
         }
         $this->view->title      = $this->lang->ldap->common . $this->lang->colon . $this->lang->ldap->setting;
@@ -78,6 +126,17 @@ class ldap extends control
         $this->display();
     }
 
+    /**
+     * test of ldap.
+     *
+     * @param  string   $host
+     * @param  string   $port
+     * @param  string   $dn
+     * @param  string   $pwd
+     * @param  string   $version
+     * @access public
+     * @return public
+    */
     public function test()
     {
       if (!empty($_POST)) {
@@ -92,6 +151,14 @@ class ldap extends control
         $this->send(array("code"=>"99999","results"=>$this->lang->ldap->notpost)); 
       }
     }
+    /**
+     * test of ldap.
+     *
+     * @param  string   $ldapUserName
+     * @param  string   $ldapUserPass
+     * @access public
+     * @return public
+    */
     public function usertest()
     {
       if (!empty($_POST)) {
@@ -101,6 +168,12 @@ class ldap extends control
         $this->send(array("code"=>"99999","results"=>$this->lang->ldap->notpost)); 
       }
     }
+    /**
+     * test of ldap.
+     *
+     * @access public
+     * @return public
+    */
     public function sync()
     { 
       $groups = $this->ldap->syncGroups2db($this->config->ldap);

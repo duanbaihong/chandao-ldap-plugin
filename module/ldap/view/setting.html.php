@@ -2,7 +2,7 @@
 /**
  * The model file of ldap module of ZenTaoPMS.
  *
- * @license     dbh ()
+ * @license     dbh 
  * @author      dbh888
  * @package     ldap
  * @link        http://www.zentao.net
@@ -87,6 +87,32 @@ include '../../common/view/header.html.php';
           ldap->bindPWD, "class='form-control' required autocomplete=off");?>
         </td>
       </tr>
+
+        <tr class="has_enable_tls <?php echo $config->
+                ldap->proto=='ldaps'?'enable':'' ?>">
+          <th>
+            <?php echo $lang->ldap->caCert; ?></th>
+          <td class='w-p50 required'>
+              <?php echo html::file('ldapCACert', 'class="form-control"'." placeholder='{$lang->ldap->placeCACert}'");?>
+          </td>
+        </tr>
+        <tr class="has_enable_tls <?php echo $config->
+                ldap->proto=='ldaps'?'enable':'' ?>">
+          <th>
+            <?php echo $lang->ldap->clientKey; ?></th>
+          <td class='w-p50 required'>
+            <?php echo html::file('ldapClientKey', 'class="form-control"'." placeholder='{$lang->ldap->placeClientKey}'") ?>
+          </td>
+        </tr>
+        <tr class="has_enable_tls <?php echo $config->
+                ldap->proto=='ldaps'?'enable':'' ?>">
+          <th>
+            <?php echo $lang->ldap->clientCert; ?></th>
+          <td class='w-p50 required'>
+            <?php echo html::file('ldapClientCert','class="form-control"'." placeholder='{$lang->ldap->placeClientCert}'")?>
+          </td>
+        </tr>
+
       <tr>
         <td></td>
         <td class="text-right">

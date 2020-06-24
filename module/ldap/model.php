@@ -152,22 +152,16 @@ class ldapModel extends model
         }
         $user->ip=$this->server->remote_addr;
         $user->deleted='0';
+        $user->user_type='ldap';
         $user->gender='m';
         $user->password=md5($password);
         $user->join = date(DT_DATE1, $this->server->request_time);
         $user->last = time();
         if($record){
             $user_update=$this->dao->update(TABLE_USER)
-                ->set('visits = visits + 1')
-                ->set('ip')->eq($user->ip)
-                ->set('last')->eq($user->last)
-                ->set('password')->eq($user->password)
-                ->set('deleted')->eq($user->deleted);
-            foreach ($this->ldap_usermap as $k => $v) {
-                if( $k == 'account' || $k == 'password' ) continue;
-                $user_update->set($k)->eq($users[0][$v][0]);
-            }
-            $user_update->where('account')->eq($username)->exec();
+                ->data($user)
+                ->set(',visits = visits + 1')
+                ->where('account')->eq($username)->exec();
         }else{
             $user_insert=$this->dao->insert(TABLE_USER)->data($user)->autoCheck()->exec();
         }

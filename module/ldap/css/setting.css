@@ -75,6 +75,6 @@ input[type='file'] {
     outline: none;
     padding: 3px;
 }
-input[type='file']:hover{
+input[type='file']:hover,input[type='file']:focus{
     outline: none;
 }

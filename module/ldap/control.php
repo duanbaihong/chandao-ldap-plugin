@@ -141,7 +141,12 @@ class ldap extends control
     {
       if (!empty($_POST)) {
         $postargs=$this->post;
-        $test_status=$this->ldap->testconn("{$postargs->proto}://{$postargs->host}:{$postargs->port}",$postargs->port, $postargs->dn, $postargs->pwd,$postargs->version);
+        $test_status=$this->ldap->testconn($postargs->proto,
+                                           $postargs->host,
+                                           $postargs->port, 
+                                           $postargs->dn, 
+                                           $postargs->pwd,
+                                           $postargs->version);
         if($test_status == "Success"){
           $this->send(array("code"=>"00000","results"=>$test_status)); 
         }else{

@@ -17,12 +17,14 @@ function check_return_data(obj,data) {
 }
 function onClickTest(obj) {
     $(obj).attr('disabled',true);
-    var par={host: $('#ldapHost').val(),
-             dn: $('#ldapBindDN').val(),
-             pwd: $('#ldapPassword').val(),
-             proto: $('#ldapProto').val(),
-             port: $('#ldapPort').val(),
-             version: $('#ldapVersion').val()
+    var par={
+            proto: $('#ldapProto').val(),
+            host: $('#ldapHost').val(),
+            dn: $('#ldapBindDN').val(),
+            pwd: $('#ldapPassword').val(),
+            proto: $('#ldapProto').val(),
+            port: $('#ldapPort').val(),
+            version: $('#ldapVersion').val()
         }
     $.post(createLink('ldap', 'test'),par, function(data) {
         check_return_data('.ldap_setting',data)

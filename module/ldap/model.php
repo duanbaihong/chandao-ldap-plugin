@@ -43,12 +43,28 @@ class ldapModel extends model
         // 格式连接地址参数
         $this->ldap_protoaddr="{$this->ldap_config->proto}://{$this->ldap_config->host}:{$this->ldap_config->port}";
         // 建立ＬＤＡＰ连接
-        $this->ldap_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
-        ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
-        ldap_set_option($this->ldap_conn,LDAP_OPT_NETWORK_TIMEOUT,10);
+        try {
+            $this->ldap_conn=ldap_connect($this->ldap_protoaddr,$this->ldap_config->port);
+            ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
+            ldap_set_option($this->ldap_conn,LDAP_OPT_NETWORK_TIMEOUT,10);
+            if($this->ldap_config->ldapProto=='ldaps'){
+                $this->setEnableTLS();
+            }
+        } catch (Exception $e) {
+            echo $e; 
+        }
+
         // bind dn
         // $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
 
+    }
+    protected function setEnableTLS()
+    {
+        try {
+            ldap_start_tls($this->ldap_conn);
+        } catch (Exception $e) {
+            echo ldap_error($conn_tls);
+        }
     }
     /**
      * 效验参数
@@ -277,22 +293,25 @@ class ldapModel extends model
     }
     /**
      * [testconn 测试LDAP连接]
+     * @param  string  $proto [协议]
      * @param  string  $addr [地址]
      * @param  integer $port [端口]
      * @param  string  $dn   [binddn]
      * @param  string  $pwd  [密码]
      * @param  integer $ver  [版本号]
      */
-    public function testconn($addr="",$port=389,$dn="",$pwd="",$ver=3)
+    public function testconn($proto='ldap',$addr="",$port=389,$dn="",$pwd="",$ver=3)
     {
         if(!function_exists('ldap_connect')) return false;
         $ret = '';
+        if($proto=='ldaps'){
+            putenv('LDAPTLS_REQCERT=require');
+        };
         $ds = ldap_connect($addr,(int)$port);
         if ($ds) {
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,$ver);
             ldap_set_option($ds,LDAP_OPT_NETWORK_TIMEOUT,10);
             ldap_bind($ds, $dn, $pwd);
-
             $ret = ldap_error($ds);
             ldap_close($ds);
         }  else {

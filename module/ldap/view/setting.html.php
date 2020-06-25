@@ -28,7 +28,7 @@ include '../../common/view/header.html.php';
     </div>
   <?php } ?>
   <!-- form-condensed -->
-  <form class='pdt-20' method='post' action='<?php echo inlink('setting');?>
+  <form class='pdt-20' enctype="multipart/form-data" method='post' action='<?php echo inlink('setting');?>
     '>
     <table class='table table-form'>
       <tr>
@@ -46,26 +46,26 @@ include '../../common/view/header.html.php';
       <tr>
         <th >
           <?php echo $lang->ldap->host; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <div class='input-group'>
             <span class='input-group-addon ldap_select_proto'>
               <?php echo html::select('ldapProto', array('ldap'=>
               'ldap','ldaps'=>'ldaps'),$config->
-                ldap->proto, "class='form-control' required placeholder='ldap/ldaps'");?>
+                ldap->proto, "class='form-control' placeholder='ldap/ldaps' required");?>
             </span>
             <?php echo html::input('ldapHost', $config->
-            ldap->host, "class='form-control' required placeholder='ip/domain'");?>
+            ldap->host, "class='form-control' placeholder='ip/domain' required");?>
             <span class='input-group-addon'>
               <?php echo $lang->ldap->port;?></span>
             <?php echo html::input('ldapPort', $config->
-            ldap->port, "class='form-control ldap_port' required placeholder='389/636'");?>
+            ldap->port, "class='form-control ldap_port' placeholder='389/636' required");?>
           </div>
         </td>
       </tr>
       <tr>
         <th>
           <?php echo $lang->ldap->version; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::select('ldapVersion',  array('2'=>
           '2','3'=>'3'),$config->
             ldap->version, "class='form-control chosen' required placeholder='2,3'");?>
@@ -74,7 +74,7 @@ include '../../common/view/header.html.php';
       <tr>
         <th>
           <?php echo $lang->ldap->bindDN; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::input('ldapBindDN', $config->
           ldap->bindDN, "class='form-control' required placeholder='cn=admin,dc=test,dc=com'");?>
         </td>
@@ -82,7 +82,7 @@ include '../../common/view/header.html.php';
       <tr>
         <th>
           <?php echo $lang->ldap->password; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::password('ldapPassword', $config->
           ldap->bindPWD, "class='form-control' required autocomplete=off");?>
         </td>
@@ -92,7 +92,7 @@ include '../../common/view/header.html.php';
                 ldap->proto=='ldaps'?'enable':'' ?>">
           <th>
             <?php echo $lang->ldap->caCert; ?></th>
-          <td class='w-p50 required'>
+          <td class='w-p50'>
               <?php echo html::file('ldapCACert', 'class="form-control"'." placeholder='{$lang->ldap->placeCACert}'");?>
           </td>
         </tr>
@@ -100,7 +100,7 @@ include '../../common/view/header.html.php';
                 ldap->proto=='ldaps'?'enable':'' ?>">
           <th>
             <?php echo $lang->ldap->clientKey; ?></th>
-          <td class='w-p50 required'>
+          <td class='w-p50'>
             <?php echo html::file('ldapClientKey', 'class="form-control"'." placeholder='{$lang->ldap->placeClientKey}'") ?>
           </td>
         </tr>
@@ -108,7 +108,7 @@ include '../../common/view/header.html.php';
                 ldap->proto=='ldaps'?'enable':'' ?>">
           <th>
             <?php echo $lang->ldap->clientCert; ?></th>
-          <td class='w-p50 required'>
+          <td class='w-p50'>
             <?php echo html::file('ldapClientCert','class="form-control"'." placeholder='{$lang->ldap->placeClientCert}'")?>
           </td>
         </tr>
@@ -124,7 +124,7 @@ include '../../common/view/header.html.php';
       <tr>
         <th>
           <?php echo $lang->ldap->baseDN; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::input('ldapBaseDN', $config->
           ldap->baseDN, "class='form-control' required placeholder='dc=test,dc=com'");?>
         </td>
@@ -132,9 +132,9 @@ include '../../common/view/header.html.php';
       <tr>
         <th>
           <?php echo $lang->ldap->userSearchOU; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::input('ldapUserOU', $config->
-          ldap->userSearchOU, "class='form-control' required=required placeholder='ou=users'");?>
+          ldap->userSearchOU, "class='form-control' required placeholder='ou=users'");?>
         </td>
       </tr>
       <tr>
@@ -148,17 +148,17 @@ include '../../common/view/header.html.php';
       <tr>
         <th>
           <?php echo $lang->ldap->userFieldMap; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::input('ldapUserFieldMap', stripslashes($config->
-          ldap->userFieldMap), "class='form-control' required=required placeholder='{\"account\": \"uid\",\"email\": \"mail\",\"realname\":\"sn\",\"mobile\":\"mobile\"}'");?>
+          ldap->userFieldMap), "class='form-control' required placeholder='{\"account\": \"uid\",\"email\": \"mail\",\"realname\":\"sn\",\"mobile\":\"mobile\"}'");?>
         </td>
       </tr>
       <tr>
         <th>
           <?php echo $lang->ldap->groupSearchOU; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::input('ldapGroupOU', $config->
-          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=groups'");?>
+          ldap->groupSearchOU, "class='form-control' required placeholder='ou=groups'");?>
         </td>
       </tr>
       <tr>
@@ -172,9 +172,9 @@ include '../../common/view/header.html.php';
       <tr>
         <th>
           <?php echo $lang->ldap->groupFieldMap; ?></th>
-        <td class='w-p50 required'>
+        <td class='w-p50'>
           <?php echo html::input('ldapGroupFieldMap', stripslashes($config->
-          ldap->groupFieldMap), "class='form-control' required=required placeholder='{\"name\":\"cn\",\"desc\":\"description\",\"role\":\"cn\"}'");?>
+          ldap->groupFieldMap), "class='form-control' required placeholder='{\"name\":\"cn\",\"desc\":\"description\",\"role\":\"cn\"}'");?>
         </td>
       </tr>
       <tr>
@@ -222,7 +222,7 @@ include '../../common/view/header.html.php';
             <tr>
               <th>
                 <?php echo $lang->ldap->username; ?>:</th>
-              <td class='w-p50 required'>
+              <td class='w-p50'>
                 <?php echo html::input('ldapUserName', $config->
                 ldap->username, "class='form-control' required placeholder='".$lang->ldap->username."'");?>
               </td>
@@ -231,7 +231,7 @@ include '../../common/view/header.html.php';
             <tr>
               <th>
                 <?php echo $lang->ldap->userpass; ?>:</th>
-              <td class='w-p50 required'>
+              <td class='w-p50'>
                 <?php echo html::password('ldapUserPass', $config->
                 ldap->userpass, "class='form-control' autocomplete=off required placeholder='".$lang->ldap->userpass."'");?>
               </td>

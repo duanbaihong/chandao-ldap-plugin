@@ -1,7 +1,12 @@
 function check_return_data(obj,data) {
     var obj= obj || '.ldap_setting'
     try{
-        msg=$.parseJSON(data)
+        console.log(data instanceof Object)
+        if (data instanceof Object){
+            msg=data
+        }else{
+            msg=$.parseJSON(data)
+        }
     }catch(err){
         msg={code: "99999",results: data+"."+err}
     }
@@ -17,19 +22,32 @@ function check_return_data(obj,data) {
 }
 function onClickTest(obj) {
     $(obj).attr('disabled',true);
-    var par={
-            proto: $('#ldapProto').val(),
-            host: $('#ldapHost').val(),
-            dn: $('#ldapBindDN').val(),
-            pwd: $('#ldapPassword').val(),
-            proto: $('#ldapProto').val(),
-            port: $('#ldapPort').val(),
-            version: $('#ldapVersion').val()
+    var formData= new FormData();
+    formData.append('proto',$('#ldapProto').val());
+    formData.append('host',$('#ldapHost').val());
+    formData.append('dn',$('#ldapBindDN').val());
+    formData.append('pwd',$('#ldapPassword').val());
+    formData.append('port',$('#ldapPort').val());
+    formData.append('version',$('#ldapVersion').val());
+    if($('#ldapProto').val()=='ldaps'){
+        formData.append('caCert',$('#ldapCACert').get(0).files[0] || new Blob());
+        formData.append('clientKey',$('#ldapClientKey').get(0).files[0] || new Blob());
+        formData.append('clientCert',$('#ldapClientCert').get(0).files[0] || new Blob());
+    }
+    $.ajax({
+        url: createLink('ldap', 'test'),
+        dataType: 'json',
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+            check_return_data('.ldap_setting',data)
+        },
+        complete: function(data) {
+           $(obj).removeAttr('disabled')
         }
-    $.post(createLink('ldap', 'test'),par, function(data) {
-        check_return_data('.ldap_setting',data)
-        $(obj).removeAttr('disabled')// alert(msg);
-    });
+    })
 }
 
 function syncGroups(obj) {
@@ -67,11 +85,11 @@ $("#ldapProto").change(function() {
     var tls=$(".has_enable_tls")
     if(val=='ldap') {
         port=389
-        tls.removeClass('enable')
+        tls.fadeOut()
     }
     if(val=='ldaps'){
         port=636
-        tls.addClass('enable')
+        tls.fadeIn()
     }
     $("#ldapPort").val(port)
     

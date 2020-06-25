@@ -96,6 +96,22 @@ class ldap extends control
             $file = fopen("config.php", "w") or die("Unable to open file!");
             fwrite($file, $ldapConfig); 
             fclose($file); 
+            $BasePath=$this->app->getModulePath('', 'ldap') . 'certs'  . DS;
+            if(!is_dir($BasePath)){
+              mkdir($BasePath, 0700, true);
+            }
+            $TlsFileMap=array(
+              'ldapCACert'=>'ca.crt',
+              'ldapClientKey'=>'client.key',
+              'ldapClientCert'=>'client.crt'
+            );
+            foreach ($_FILES as $key => $value) {
+              $dest_tls_file=$TlsFileMap[$key];
+              if($value['size']>0 && !empty($dest_tls_file)){
+                move_uploaded_file($value['tmp_name'],$BasePath.$dest_tls_file);
+              }
+            }
+       
             $newConfig=new stdclass();
             $newConfig->configid='0';
             $newConfig->ldapopen=$this->post->ldapOpen=='true'?'true':'false';
@@ -113,10 +129,14 @@ class ldap extends control
             $newConfig->syncgroups=$this->post->ldapSyncGroups=='true'?'true':'false';
             $newConfig->usermap=$usermap;
             $newConfig->groupmap=$groupmap;
-            $newConfig->tls=$this->post->ldapProto=='ldaps'?'true':'false';
-            $newConfig->cacert=$this->post->ldapCACert;
-            $newConfig->clientkey=$this->post->ldapClientKey;
-            $newConfig->clientcert=$this->post->ldapClientCert;
+            
+            if($this->post->ldapProto=='ldaps'){
+              $newConfig->tls='true';
+              $newConfig->cacert=$BasePath.'ca.crt';
+              $newConfig->clientkey=$BasePath.'client.key';
+              $newConfig->clientcert=$BasePath.'client.crt';
+            }
+
             $this->dao->replace($this->config->db->prefix.'ldap')->data($newConfig)->exec();
             $this->view->SaveSuccess=$this->lang->ldap->savesuccess;
         }
@@ -137,16 +157,19 @@ class ldap extends control
      * @access public
      * @return public
     */
+
     public function test()
     {
       if (!empty($_POST)) {
         $postargs=$this->post;
+        $tls_files=$_FILES;
         $test_status=$this->ldap->testconn($postargs->proto,
                                            $postargs->host,
                                            $postargs->port, 
                                            $postargs->dn, 
                                            $postargs->pwd,
-                                           $postargs->version);
+                                           $postargs->version,
+                                           $tls_files);
         if($test_status == "Success"){
           $this->send(array("code"=>"00000","results"=>$test_status)); 
         }else{

@@ -45,16 +45,11 @@ class ldapModel extends model
         // 格式连接地址参数
         $this->ldap_protoaddr="{$this->ldap_config->proto}://{$this->ldap_config->host}:{$this->ldap_config->port}";
         // 建立ＬＤＡＰ连接
-        if($this->ldap_config->ldapProto=='ldaps'){
-            $this->EnableTLSCertEnv();
-        }
         $this->ldap_conn=ldap_connect($this->ldap_protoaddr);
         ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
         ldap_set_option($this->ldap_conn,LDAP_OPT_NETWORK_TIMEOUT,10);
         if($this->ldap_config->ldapProto=='ldaps'){
-            ldap_set_option(NULL,LDAP_OPT_X_TLS_CACERTFILE,$this->BaseCertPath.'ca.crt');
-            ldap_set_option(NULL,LDAP_OPT_X_TLS_CERTFILE,$this->BaseCertPath.'client.crt');
-            ldap_set_option(NULL,LDAP_OPT_X_TLS_KEYFILE,$this->BaseCertPath.'client.key');
+             $this->EnableTLSCertEnv($this->ldap_conn);
             ldap_start_tls($this->ldap_conn);
         }
 
@@ -288,7 +283,7 @@ class ldapModel extends model
         return array("code"=>"00000","results"=>$msg);
     }
 
-    protected function EnableTLSCertEnv($tls_files){
+    protected function EnableTLSCertEnv($identify,$tls_files){
         if ($tls_files) {
             if($tls_files['caCert']['size']>0){
                 $CaFilePath=$tls_files['caCert']['tmp_name'];
@@ -313,6 +308,10 @@ class ldapModel extends model
             $ClientKeyFilePath = $this->BaseCertPath . 'client.key';
             $ClientCertFilePath = $this->BaseCertPath . 'client.crt';
         }
+        ldap_set_option($identify,LDAP_OPT_X_TLS_REQUIRE_CERT,0);
+        ldap_set_option($identify,LDAP_OPT_X_TLS_CACERTFILE,$CaFilePath);
+        ldap_set_option($identify,LDAP_OPT_X_TLS_CERTFILE,$ClientKeyFilePath);
+        ldap_set_option($identify,LDAP_OPT_X_TLS_KEYFILE,$ClientCertFilePath);
     }
     /**
      * [testconn 测试LDAP连接]
@@ -329,19 +328,16 @@ class ldapModel extends model
         if(!function_exists('ldap_connect')) return false;
         $ret = '';
         if($proto=='ldaps'){
-            $this->EnableTLSCertEnv($tls_files);
+           
         };
         $ds = ldap_connect("{$proto}://{$addr}:{$port}");
         if ($ds) {
-            // ldap_set_option(NULL,LDAP_OPT_DEBUG_LEVEL, 7);
+            ldap_set_option(NULL,LDAP_OPT_DEBUG_LEVEL, 7);
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,(int)$ver);
             ldap_set_option($ds,LDAP_OPT_REFERRALS,0);
             ldap_set_option($ds,LDAP_OPT_NETWORK_TIMEOUT,10);
             if($proto=='ldaps'){
-                ldap_set_option($ds,LDAP_OPT_X_TLS_REQUIRE_CERT,0);
-                ldap_set_option($ds,LDAP_OPT_X_TLS_CACERTFILE,$this->BaseCertPath.'ca.crt');
-                ldap_set_option($ds,LDAP_OPT_X_TLS_CERTFILE,$this->BaseCertPath.'client.crt');
-                ldap_set_option($ds,LDAP_OPT_X_TLS_KEYFILE,$this->BaseCertPath.'client.key');
+                $this->EnableTLSCertEnv($ds,$tls_files);
                 ldap_start_tls($ds);
             }
             ldap_bind($ds, $dn, $pwd);

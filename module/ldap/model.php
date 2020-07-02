@@ -21,6 +21,7 @@ class ldapModel extends model
     protected $ldap_bind;
     protected $syncNum;
     protected $BaseCertPath;
+    protected $ldap_err_msg;
     public function __construct()
     {
         parent::__construct();
@@ -46,15 +47,7 @@ class ldapModel extends model
         $this->ldap_protoaddr="{$this->ldap_config->proto}://{$this->ldap_config->host}:{$this->ldap_config->port}";
         // 建立ＬＤＡＰ连接
         $this->ldap_conn=ldap_connect($this->ldap_protoaddr);
-        ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
-        ldap_set_option($this->ldap_conn,LDAP_OPT_NETWORK_TIMEOUT,10);
-        if($this->ldap_config->ldapProto=='ldaps'){
-             $this->EnableTLSCertEnv($this->ldap_conn);
-            ldap_start_tls($this->ldap_conn);
-        }
-
-        // bind dn
-        // $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
+        $this->set_ldap_options();
 
     }
     /**
@@ -99,24 +92,31 @@ class ldapModel extends model
             $ldap_user=ldap_get_entries($user_conn,$result_identifier);
 
             // 获取用户组信息
-            $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
-            $ldap_group=$this->getGroups($group_filter);
-            if(!is_array($ldap_group)) return array("code"=>"99999","results"=>$ldap_group);
-            // 如果找到组信息就保存用户数据，未找到就不保存。
-            $write_user=$this->writeUsers($ldap_user,$username,$userpass);
-            if(!is_object($write_user)) return '{"code": "99999","results": "'.$write_user.'"}';
-            // 关闭LDAP连接
-            ldap_close($user_conn);
-            // 同步组信息
-            if($this->ldap_config->syncGroups == 'true' && count($ldap_group)>0){
-                $saveGroups=$this->writeGroupsInfo($ldap_group);
-                if($saveGroups != true){
-                   return array("code"=>"99999","results"=>$saveGroups);
+            if($ldap_user['count']>0){
+                $group_filter=sprintf('(&(|(member=%s)(uniqueMember=%s)(memberUid=%s))(&%s))',$usernamedn,$usernamedn,$username,$this->ldap_config->groupFilter);
+                // 如果找到组信息就保存用户数据，未找到就不保存。
+                $write_user=$this->writeUsers($ldap_user,$username,$userpass);
+                if(!is_object($write_user)) return '{"code": "99999","results": "'.$write_user.'"}';
+                // 关闭LDAP连接
+                ldap_close($user_conn);
+                // 同步组信息,如果找到用户，没有找到组，把现目前所分配的删除。
+                if($this->ldap_config->syncGroups == 'true' && $ldap_user['count']>0){
+                    $ldap_group=$this->getGroups($group_filter);
+                    if(is_array($ldap_group)) {
+                        $saveGroups=$this->writeGroupsInfo($ldap_group);
+                        if($saveGroups != true){
+                           return array("code"=>"99999","results"=>$saveGroups);
+                        }
+                    }else{
+                       $ldap_group=array(); 
+                    }
+                    $saveUserGroups=$this->writeUserGroups($ldap_group,$username);
+                    if($saveUserGroups != true){
+                       return array("code"=>"99999","results"=>$saveUserGroups);
+                    }
                 }
-                $saveUserGroups=$this->writeUserGroups($ldap_group,$username);
-                if($saveGroups != true){
-                   return array("code"=>"99999","results"=>$saveUserGroups);
-                }
+            }else{
+                return array("code"=>"99999","results"=>ldap_error($user_conn));
             }
         }else{
             return array("code"=>"99999","results"=>ldap_error($user_conn));
@@ -182,7 +182,7 @@ class ldapModel extends model
      */
     protected function writeUserGroups($groupdata=array(),$username="")
     {
-        if(empty($groupdata) || empty($username)){
+        if(empty($username)){
             return false;
         }
         $ldap_groupid=$this->ldap_groupmap['name'];
@@ -282,36 +282,26 @@ class ldapModel extends model
         $msg=sprintf($this->lang->ldap->findGroupsMsg,$ldapGroups['count'],$this->syncNum,$ldapGroups['count']-$this->syncNum);
         return array("code"=>"00000","results"=>$msg);
     }
-
-    protected function EnableTLSCertEnv($identify,$tls_files){
-        if ($tls_files) {
-            if($tls_files['caCert']['size']>0){
-                $CaFilePath=$tls_files['caCert']['tmp_name'];
-            }else{
-                $CaFilePath = $this->BaseCertPath . 'ca.crt';
-            }
-
-            if($tls_files['clientKey']['size']>0){
-                $ClientKeyFilePath=$tls_files['clientKey']['tmp_name'];
-            }else{
-                $ClientKeyFilePath = $this->BaseCertPath . 'client.key';
-            }
-            
-            if($tls_files['clientCert']['size']>0){
-                $ClientCertFilePath=$tls_files['clientCert']['tmp_name'];
-            }else{
-                $ClientCertFilePath = $this->BaseCertPath . 'client.crt';
-            }
-
-        }else{
-            $CaFilePath = $this->BaseCertPath . 'ca.crt';
-            $ClientKeyFilePath = $this->BaseCertPath . 'client.key';
-            $ClientCertFilePath = $this->BaseCertPath . 'client.crt';
+    /**
+     *[]
+     *
+     *
+     **/
+    public function set_ldap_options()
+    {
+        // 开启DEBUG
+        // ldap_set_option(NULL,LDAP_OPT_DEBUG_LEVEL, 7);
+        ldap_set_option($this->ldap_conn,LDAP_OPT_REFERRALS,0);
+        ldap_set_option($this->ldap_conn,LDAP_OPT_NETWORK_TIMEOUT,10);
+        ldap_set_option($this->ldap_conn,LDAP_OPT_PROTOCOL_VERSION,$this->ldap_config->version);
+        ldap_get_option($this->ldap_conn, LDAP_OPT_DIAGNOSTIC_MESSAGE, $this->ldap_err_msg);
+        if($this->ldap_config->ldapProto=='ldaps'){
+            ldap_set_option($this->ldap_conn,LDAP_OPT_X_TLS_REQUIRE_CERT,LDAP_OPT_X_TLS_DEMAND);
+            ldap_set_option($this->ldap_conn,LDAP_OPT_X_TLS_CACERTFILE,$this->BaseCertPath . 'ca.crt');
+            ldap_set_option($this->ldap_conn,LDAP_OPT_X_TLS_CERTFILE,$this->BaseCertPath . 'client.key');
+            ldap_set_option($this->ldap_conn,LDAP_OPT_X_TLS_KEYFILE,$this->BaseCertPath . 'client.crt');
+            ldap_start_tls($this->ldap_conn);
         }
-        ldap_set_option($identify,LDAP_OPT_X_TLS_REQUIRE_CERT,0);
-        ldap_set_option($identify,LDAP_OPT_X_TLS_CACERTFILE,$CaFilePath);
-        ldap_set_option($identify,LDAP_OPT_X_TLS_CERTFILE,$ClientKeyFilePath);
-        ldap_set_option($identify,LDAP_OPT_X_TLS_KEYFILE,$ClientCertFilePath);
     }
     /**
      * [testconn 测试LDAP连接]
@@ -336,12 +326,42 @@ class ldapModel extends model
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,(int)$ver);
             ldap_set_option($ds,LDAP_OPT_REFERRALS,0);
             ldap_set_option($ds,LDAP_OPT_NETWORK_TIMEOUT,10);
+            ldap_get_option($ds,LDAP_OPT_DIAGNOSTIC_MESSAGE, $this->ldap_err_msg);
             if($proto=='ldaps'){
-                $this->EnableTLSCertEnv($ds,$tls_files);
+                if ($tls_files) {
+                    if($tls_files['caCert']['size']>0){
+                        $CaFilePath=$tls_files['caCert']['tmp_name'];
+                    }else{
+                        $CaFilePath = $this->BaseCertPath . 'ca.crt';
+                    }
+
+                    if($tls_files['clientKey']['size']>0){
+                        $ClientKeyFilePath=$tls_files['clientKey']['tmp_name'];
+                    }else{
+                        $ClientKeyFilePath = $this->BaseCertPath . 'client.key';
+                    }
+                    
+                    if($tls_files['clientCert']['size']>0){
+                        $ClientCertFilePath=$tls_files['clientCert']['tmp_name'];
+                    }else{
+                        $ClientCertFilePath = $this->BaseCertPath . 'client.crt';
+                    }
+
+                }else{
+                    $CaFilePath = $this->BaseCertPath . 'ca.crt';
+                    $ClientKeyFilePath = $this->BaseCertPath . 'client.key';
+                    $ClientCertFilePath = $this->BaseCertPath . 'client.crt';
+                }
+                ldap_set_option($ds,LDAP_OPT_X_TLS_REQUIRE_CERT,LDAP_OPT_X_TLS_DEMAND);
+                ldap_set_option($ds,LDAP_OPT_X_TLS_CIPHER_SUITE,'HIGH:MEDIUM:+SSLv2:+TLSv1');
+                ldap_set_option($ds,LDAP_OPT_X_TLS_CACERTFILE,$CaFilePath);
+                ldap_set_option($ds,LDAP_OPT_X_TLS_CERTFILE,$ClientKeyFilePath);
+                ldap_set_option($ds,LDAP_OPT_X_TLS_KEYFILE,$ClientCertFilePath);
                 ldap_start_tls($ds);
             }
             ldap_bind($ds, $dn, $pwd);
-            $ret = ldap_err2str(ldap_errno($ds));
+            $ret = ldap_err2str(ldap_errno($ds)) . $this->ldap_err_msg;
+            ldap_set_option(NULL,LDAP_OPT_DEBUG_LEVEL, 0);
             ldap_close($ds);
         }  else {
             $ret = ldap_err2str(ldap_errno($ds));

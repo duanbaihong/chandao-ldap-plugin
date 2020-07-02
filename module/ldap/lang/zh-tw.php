@@ -45,5 +45,12 @@ $lang->ldap->findGroupsMsg    = '找到%s個組信息，同步了個%s組信息,
 $lang->ldap->testLDAPConnect  = '測試LDAP用戶連接';
 $lang->ldap->notfoundGroup    = '沒有找到用戶組相關資訊.';
 
+$lang->ldap->caCert 		  = '根證書CA:';
+$lang->ldap->clientKey 	      = '私密金鑰檔案Key:';
+$lang->ldap->clientCert       = '證書檔案PEM:';
+$lang->ldap->placeCACert      = '請選擇根證書檔案（ca.pem）…';
+$lang->ldap->placeClientKey   = '請選擇私密金鑰檔案（client.key）…';
+$lang->ldap->placeClientCert  = '請選擇證書檔案（client.pem）…';
+
 $lang->ldap->methodOrder[5]   = 'index';
 $lang->ldap->methodOrder[10]  = 'setting';

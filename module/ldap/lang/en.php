@@ -46,5 +46,12 @@ $lang->ldap->findGroupsMsg    = 'Found %s group information, synchronized %s gro
 $lang->ldap->testLDAPConnect  = 'Test LDAP user connection';
 $lang->ldap->notfoundGroup    = 'No user group related information was found';
 
+$Lang->ldap->cacert 		  ='root certificate CA: ';
+$Lang->ldap->clientkey 		  = 'private key file key:';
+$Lang->ldap->clientcert 	  ='certificate file PEM: ';
+$Lang->ldap->placecacert 	  = 'please select the root certificate file（ ca.pem )...';
+$Lang->ldap->placeclientkey   = 'please select the private key file（ client.key )...';
+$Lang->ldap->placeclientcert  = 'please select a certificate file（ client.pem )...';
+
 $lang->ldap->methodOrder[5]   = 'index';
 $lang->ldap->methodOrder[10]  = 'setting';

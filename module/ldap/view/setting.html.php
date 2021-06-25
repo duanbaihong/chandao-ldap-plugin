@@ -27,7 +27,7 @@ include '../../common/view/header.html.php';
     '>
     <table class='table table-form'>
       <tr>
-        <th class="w-p14">
+        <th class="w-p10">
           <?php echo $lang->ldap->open; ?>:</th>
         <th class="w-p50" style="text-align: left;padding: 15px 5px;">
           <div class="checkbox-primary inline-block">

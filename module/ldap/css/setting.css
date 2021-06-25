@@ -29,7 +29,7 @@
     padding: 5px;
 }
 .ldap_setting #ldapHost{
-    width: 330px;
+    width: 400px;
 }
 .ldap_setting .alert{
     position: absolute;

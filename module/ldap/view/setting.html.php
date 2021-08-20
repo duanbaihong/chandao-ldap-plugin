@@ -127,7 +127,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->groupSearchOU; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapGroupOU', $config->
-          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=groups'");?>
+          ldap->groupSearchOU, "class='form-control' required=required placeholder='ou=chandao,ou=groups'");?>
         </td>
       </tr>
       <tr>
@@ -143,7 +143,7 @@ include '../../common/view/header.html.php';
           <?php echo $lang->ldap->groupFieldMap; ?></th>
         <td class='w-p50 required'>
           <?php echo html::input('ldapGroupFieldMap', stripslashes($config->
-          ldap->groupFieldMap), "class='form-control' required=required placeholder=\"{'name':'cn','desc':'description'}\"");?>
+          ldap->groupFieldMap), "class='form-control' required=required placeholder='{\"name\":\"cn\",\"desc\":\"description\"}'");?>
         </td>
       </tr>
       <tr>

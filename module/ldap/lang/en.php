@@ -1,12 +1,12 @@
 <?php
 /**
- * The model file of ldap module of ZenTaoPMS.
- *
- * @license dbh ()
- * @author dbh888
- * @package ldap
- * @link http://www.zentao.net
- */
+* The model file of ldap module of ZenTaoPMS.
+*
+* @license dbh ()
+* @author dbh888
+* @package ldap
+* @link http://www.zentao.net
+*/
 
 $lang->ldap->common           = "LDAP";
 $lang->ldap->setting          = "Settings";

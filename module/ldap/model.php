@@ -118,6 +118,8 @@ class ldapModel extends model
     public function identify($username,$userpass)
     {
         $chk=$this->checkargs();
+        // echo var_dump($this->hasLdapUser($username));
+        // exit();
         if($chk !== true) return array("code"=>"99999","results"=>$chk);
         $user= $this->userauth($username,$userpass);
         if(is_object($user)){
@@ -145,6 +147,7 @@ class ldapModel extends model
         }
         $user->ip=$this->server->remote_addr;
         $user->deleted='0';
+        $user->user_type='ldap';
         $user->password=md5($password);
         $user->join = date(DT_DATE1, $this->server->request_time);
         $user->last = time();
@@ -153,6 +156,7 @@ class ldapModel extends model
                 ->set('visits = visits + 1')
                 ->set('ip')->eq($user->ip)
                 ->set('last')->eq($user->last)
+                ->set('user_type')->eq("ldap")
                 ->set('password')->eq($user->password)
                 ->set('deleted')->eq($user->deleted)
                 ->where('account')->eq($username)
@@ -257,6 +261,23 @@ class ldapModel extends model
         $data = ldap_get_entries($this->ldap_conn, $rlt);
         return $data;
     }
+
+    protected function hasLdapUser($username="",$filter="",$attrs=array()){
+        $fmtFilter=sprintf(empty($filter)?$this->ldap_config->userFilter:$filter,$username);
+        $this->ldap_bind=ldap_bind($this->ldap_conn,$this->ldap_config->bindDN,$this->ldap_config->bindPWD);
+        $rlt = ldap_search($this->ldap_conn,
+            $this->ldap_usersdn, 
+            $fmtFilter, 
+            count($attrs)===0?$this->ldap_userattrs:$attrs);
+        if(!$rlt){
+             return ldap_error($this->ldap_conn);
+        }
+        $data = ldap_get_entries($this->ldap_conn, $rlt);
+        return $data;
+    }
+    /**
+     * 同步组到数据库
+     */
     public function syncGroups2db()
     {
         $chk=$this->checkargs();
@@ -279,16 +300,19 @@ class ldapModel extends model
     {
         $ret = '';
         $ds = ldap_connect($addr,(int)$port);
+        $code ="99999";
         if ($ds) {
             ldap_set_option($ds,LDAP_OPT_PROTOCOL_VERSION,$ver);
-            ldap_bind($ds, $dn, $pwd);
-
+            if(ldap_bind($ds, $dn, $pwd)){
+                $code="00000";
+            }
             $ret = ldap_error($ds);
             ldap_close($ds);
+            
         }  else {
             $ret = ldap_error($ds);
         }
-        echo "{$ret}.{$addr}";
+        return array("code"=>$code,"results"=>array("status"=>$ret,"msg"=>$addr));
     }
     
     public function __destruct()

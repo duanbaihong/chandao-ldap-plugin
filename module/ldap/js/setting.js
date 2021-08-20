@@ -8,32 +8,30 @@ function onClickTest(obj) {
              version: $('#ldapVersion').val()
         }
     $.post(createLink('ldap', 'test'),par, function(data) {
-        alert_msgObj[popoIndex]=$(html).css({zIndex: popoIndex});
-        $(".ldap_setting").prepend(alert_msgObj[popoIndex].append(data));
-        setTimeout("alert_msgObj["+popoIndex+"].addClass('alert-info in');setTimeout('alert_msgObj["+popoIndex+"].alert(\"close\")',4000)",100)
-        $(obj).removeAttr('disabled');
-        popoIndex+=1
+        displayStatus(data,$(".ldap_setting"),$(obj))
     });
 }
-
+function displayStatus(data,dispObj,ctlObj){
+    try{
+        msg=$.parseJSON(data)
+    }catch(err){
+        msg={code: "99999",results: data+"."+err}
+    }
+    alert_msgObj[popoIndex]=$(html).css({zIndex: popoIndex});
+    dispObj.prepend(alert_msgObj[popoIndex].append((typeof msg.results === 'object')?Object.values(msg.results).join(','):msg.results));
+    if(msg.code == "00000") {
+        classvar='alert-info in'
+    } else {
+        classvar='alert-danger in';
+    }
+    setTimeout("alert_msgObj["+popoIndex+"].addClass(`${classvar}`);setTimeout('alert_msgObj["+popoIndex+"].alert(\"close\")',4000)",100)
+    ctlObj.removeAttr('disabled');
+    popoIndex+=1
+}
 function syncGroups(obj) {
     $(obj).attr('disabled',true);
     $.get(createLink('ldap', 'sync'), function(ret){
-        try{
-            msg=$.parseJSON(ret)
-        }catch(err){
-            msg={code: "99999",results: ret+"."+err}
-        }
-        alert_msgObj[popoIndex]=$(html).css({zIndex: popoIndex});
-        $(".ldap_setting").prepend(alert_msgObj[popoIndex].append(msg.results));
-        if(msg.code == "00000") {
-            classvar='alert-info in'
-        } else {
-            classvar='alert-danger in';
-        }
-        setTimeout("alert_msgObj["+popoIndex+"].addClass(`${classvar}`);setTimeout('alert_msgObj["+popoIndex+"].alert(\"close\")',4000)",100)
-        $(obj).removeAttr('disabled');
-        popoIndex+=1
+        displayStatus(ret,$(".ldap_setting"),$(obj))
     });
 }
 $(".ldap_testuser").click(function() {
@@ -54,21 +52,7 @@ $(".ldap_testuser").click(function() {
     _this=$(this)
     _this.attr('disabled',true)
     $.post(createLink('ldap', 'usertest'),args,function(ret) {
-        try{
-            msg=$.parseJSON(ret)
-        }catch(err){
-            msg={code: "99999",results: ret+"."+err}
-        }
-        if(msg.code == "00000") {
-            classvar='alert-info in'
-        } else {
-            classvar='alert-danger in';
-        }
-        alert_msgObj[popoIndex]=$(html).css({zIndex: popoIndex});
-        $("#showModuleModal .modal-header").prepend(alert_msgObj[popoIndex].append(msg.results));
-        setTimeout("alert_msgObj["+popoIndex+"].addClass(`${classvar}`);setTimeout('alert_msgObj["+popoIndex+"].alert(\"close\")',4000)",100)
-        _this.removeAttr('disabled')// alert(msg);
-        popoIndex+=1
+        displayStatus(ret,$("#showModuleModal .modal-header"),_this)
     })
 })
 $("#ldapProto").change(function() {
